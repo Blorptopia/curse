@@ -1,23 +1,23 @@
 import { type HTMLTemplateResult, LitElement, html, type CSSResultGroup, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import type { IngredientId } from "../types/ingredient";
+import type { CustomerId } from "../types/market";
 
-const INGREDIENT_TO_IMAGES = {
-	BLUE_PILL: "",
-	RED_PILL: ""
-} satisfies Record<IngredientId, string>;
+const ID_TO_IMAGES = {
+	GUSTAVO: "",
+	JACK: ""
+} satisfies Record<CustomerId, string>;
 
-@customElement("curse-ingredient-icon")
-export class IngredientIconElement extends LitElement {
+@customElement("curse-customer-portrait")
+export class CustomerPortaitElement extends LitElement {
 	@property({type: String})
-	public ingredientId: IngredientId;
+	public customerId: CustomerId;
 
 	public constructor() {
 		super();
-		this.ingredientId = "BLUE_PILL";
+		this.customerId = "GUSTAVO";
 	}
 	protected render(): HTMLTemplateResult {
-		const imageUrl = INGREDIENT_TO_IMAGES[this.ingredientId];
+		const imageUrl = ID_TO_IMAGES[this.customerId];
 	   	return html`
 			<img src=${imageUrl} alt="">
 		`;
@@ -28,12 +28,12 @@ export class IngredientIconElement extends LitElement {
 			display: block;
 			height: 100%;
 			width: 100%;
-			aspect-ratio: 1;
+			aspect-ratio: 1 / 3;
 		}
 		img {
 			height: 100%;
 			width: 100%;
-			aspect-ratio: 1;
+			aspect-ratio: 1 / 3;
 		}
 	`;
 }

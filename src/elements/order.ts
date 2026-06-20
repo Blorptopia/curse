@@ -1,62 +1,82 @@
 import { css, html, type HTMLTemplateResult, LitElement, type CSSResultGroup } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { Order } from "../types/market";
-import { repeat } from "lit/directives/repeat.js";
 import "./ingredient_icon";
-import "./customer_icon";
+import "./customer_shadow";
+import { styleMap } from "lit/directives/style-map.js";
 
 @customElement("curse-order")
 export class OrderElement extends LitElement {
 	@property({type: Object})
 	public order?: Order;
+	@property({type: Boolean})
+	public canAccept: boolean;
+
+	public constructor() {
+		super();
+		this.canAccept = true;
+	}
 
 	public render(): HTMLTemplateResult {
 		if (this.order === undefined) {
 			return html``;
 		}
 		return html`
-			<curse-customer-icon .customerId=${this.order.customerId}></curse-customer-icon>
-			<div id="ingredients">
-				${repeat(this.order.ingredientIds, ingredientId => ingredientId, ingredientId => html`
-					<curse-ingredient-icon .ingredientId=${ingredientId}></curse-ingredient-icon>
-				 `)}
+			<div id="details">
+				<div id="details-header">
+					<h1 id="name">${this.order.name}</h1>
+					<div>
+						<div id="target-color" style=${styleMap({backgroundColor: this.order.targetColor})}></div>
+					</div>
+				</div>
+				${this.order.description !== "" ? html`<p>${this.order.description}</p>` : null}
+				<div id="actions">
+					<span id="value">${this.order.value}$</span>
+					<button class="primary" type="button" ?hidden=${!this.canAccept} @click=${this.accept}>Accept</button>
+					<button class="destructive" type="button" ?hidden=${!this.canAccept} @click=${this.reject}>Reject</button>
+				</div>
 			</div>
-			<span id="value">${this.order.value}$</span>
+			<curse-customer-shadow .customerId=${this.order.customerId}></curse-customer-shadow>
 		`;
+	}
+	private accept(): void {
+		const customEvent = new CustomEvent("curse-accept-order");
+		this.dispatchEvent(customEvent);
+	}
+	private reject(): void {
+		const customEvent = new CustomEvent("curse-reject-order");
+		this.dispatchEvent(customEvent);
 	}
 	public static styles?: CSSResultGroup = css`
 		:host {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+			justify-content: flex-end;
+		}
+		#details {
+			background: white;
+			color: black;
+			border-radius: 2rem;
 			padding: 1rem;
-			position: relative;
-		}
-		curse-customer-icon {
-			display: block;
-			--size: 4rem;
-			height: var(--size);
-			width: var(--size);
-		}
-		#ingredients {
-			position: absolute;
-			bottom: .1rem;
-			right: .1rem;
-
-			background: black;
-			border-radius: 1rem;
-			padding: .25rem;
 
 			display: flex;
-			gap: .2rem;
+			flex-direction: column;
 		}
-		curse-ingredient-icon {
+		#details-header {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+		#target-color {
 			display: block;
-			--size: 1.2rem;
+			--size: 2rem;
 			height: var(--size);
 			width: var(--size);
+
+			border-radius: 50%;
 		}
 		#value {
-			position: absolute;
-			top: 1rem;
-			left: 1rem;
 			color: green;
 		}
 	`;

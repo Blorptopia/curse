@@ -2,12 +2,15 @@ import { type HTMLTemplateResult, LitElement, html, type CSSResultGroup, css } f
 import { customElement, property } from "lit/decorators.js";
 import type { CustomerId } from "../types/market";
 
+import JackShadowURL from "../assets/customers/jack/shadow.png";
+
 const ID_TO_IMAGES = {
-	GUSTAVO: ""
+	GUSTAVO: "",
+	JACK: JackShadowURL
 } satisfies Record<CustomerId, string>;
 
-@customElement("curse-customer-icon")
-export class CustomerIconElement extends LitElement {
+@customElement("curse-customer-shadow")
+export class CustomerShadowElement extends LitElement {
 	@property({type: String})
 	public customerId: CustomerId;
 
@@ -23,10 +26,15 @@ export class CustomerIconElement extends LitElement {
 	}
 
 	public static styles?: CSSResultGroup = css`
+		:host {
+			--height: 110;
+			--width: 233;
+			display: block;
+			aspect-ratio: 1 / 3;
+		}
 		img {
-			height: 100%;
 			width: 100%;
-			aspect-ratio: 1;
+			aspect-ratio: 1 / 3;
 		}
 	`;
 }
