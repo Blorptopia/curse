@@ -7,8 +7,8 @@ const ID_TO_IMAGES = {
 	JACK: ""
 } satisfies Record<CustomerId, string>;
 
-@customElement("curse-customer-head")
-export class CustomerHeadElement extends LitElement {
+@customElement("curse-customer-portrait")
+export class CustomerPortraitElement extends LitElement {
 	@property({type: String})
 	public customerId: CustomerId;
 
@@ -26,14 +26,14 @@ export class CustomerHeadElement extends LitElement {
 	public static styles?: CSSResultGroup = css`
 		:host {
 			display: block;
-			height: 100%;
 			width: 100%;
-			aspect-ratio: 1 / 3;
+			--height: 1;
+			--width: 0.67;
+			aspect-ratio: var(--width) / var(--height);
 		}
 		img {
-			height: 100%;
 			width: 100%;
-			aspect-ratio: 1 / 3;
+			aspect-ratio: var(--width) / var(--height);
 		}
 	`;
 }
