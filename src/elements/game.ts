@@ -1,6 +1,6 @@
 import { css, html, LitElement, type CSSResultGroup, type HTMLTemplateResult } from "lit";
 import { customElement } from "lit/decorators.js";
-import "./ingredients";
+import "./store";
 import "./orders";
 import { INGREDIENTS } from "../data/ingredients";
 import type { Order } from "../types/market";
@@ -19,7 +19,7 @@ export class GameElement extends LitElement {
 		];
 	   	return html`
 			<curse-orders .orders=${orders}></curse-orders>
-			<curse-ingredients .ingredientIds=${ingredientIds}></curse-ingredients>
+			<curse-store .unlockedIngredientIds=${ingredientIds}></curse-store>
 		`; 
 	}
 
@@ -27,12 +27,12 @@ export class GameElement extends LitElement {
 		:host {
 			display: grid;
 			grid-template-columns: 1fr 3fr 1fr;
-			grid-template-areas: "orders board ingredients";
+			grid-template-areas: "orders board store";
 
 			height: 100%;
 		}
-		curse-ingredients {
-			grid-area: ingredients;
+		curse-store {
+			grid-area: store;
 		}
 		curse-orders {
 			grid-area: orders;

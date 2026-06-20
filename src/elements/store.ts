@@ -5,21 +5,22 @@ import type { IngredientId } from "../types/ingredient";
 import { INGREDIENTS } from "../data/ingredients";
 import "./ingredient_icon";
 
-@customElement("curse-ingredients")
-export class IngredientsElement extends LitElement {
+@customElement("curse-store")
+export class StoreElement extends LitElement {
 	@property({type: Array})
-	public ingredientIds: IngredientId[];
+	public unlockedIngredientIds: IngredientId[];
 
 	public constructor() {
 		super();
-		this.ingredientIds = [];
+		this.unlockedIngredientIds = [];
 	}
 
 	protected render(): HTMLTemplateResult {
+		const ingredientIds = Object.keys(INGREDIENTS) as IngredientId[];
 	   	return html`
 			<h1>Ingredients</h1>
 			<div id="ingredients">
-				${repeat(this.ingredientIds, id => id, id => this.renderIngredient(id))}
+				${repeat(ingredientIds, id => id, id => this.renderIngredient(id))}
 			</div>
 		`; 
 	}
