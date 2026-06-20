@@ -20,10 +20,22 @@ export class OrdersElement extends LitElement {
 	protected render(): HTMLTemplateResult {
 	   	return html`
 			<div id="orders" style=${styleMap({backgroundImage: `url("${OrdersBackgroundURL}")`, "--max-pending-orders": MAX_PENDING_ORDERS})}>
-				${repeat(this.orders, order => order, (order, index) => html`
-					<curse-order .order=${order} style=${styleMap({gridColumn: MAX_PENDING_ORDERS - index})}></curse-order>
-				 `)}
+				${repeat(this.orders, order => order, this.renderOrder)}
 			</div>
+		`;
+	}
+	private renderOrder(order: Order, orderIndex: number): HTMLTemplateResult | null {
+		if (orderIndex > MAX_PENDING_ORDERS) {
+			return null;
+		}
+		return html`
+			<curse-order
+				.order=${order}
+				style=${styleMap({
+					gridColumn: MAX_PENDING_ORDERS - orderIndex,
+					gridRow: 1
+				})}
+			></curse-order>
 		`;
 	}
 
@@ -34,6 +46,7 @@ export class OrdersElement extends LitElement {
 		#orders {
 			display: grid;
 			grid-template-columns: repeat(var(--max-pending-orders), 1fr);
+			grid-template-rows: 1fr;
 			justify-content: flex-end;
 			width: 100%;
 			height: 100%;
