@@ -16,11 +16,12 @@ export class OrderElement extends LitElement {
 		}
 		return html`
 			<curse-customer-icon .customerId=${this.order.customerId}></curse-customer-icon>
-			<div class="ingredients">
+			<div id="ingredients">
 				${repeat(this.order.ingredientIds, ingredientId => ingredientId, ingredientId => html`
 					<curse-ingredient-icon .ingredientId=${ingredientId}></curse-ingredient-icon>
 				 `)}
 			</div>
+			<span id="value">${this.order.value}$</span>
 		`;
 	}
 	public static styles?: CSSResultGroup = css`
@@ -34,7 +35,7 @@ export class OrderElement extends LitElement {
 			height: var(--size);
 			width: var(--size);
 		}
-		.ingredients {
+		#ingredients {
 			position: absolute;
 			bottom: .1rem;
 			right: .1rem;
@@ -51,6 +52,12 @@ export class OrderElement extends LitElement {
 			--size: 1.2rem;
 			height: var(--size);
 			width: var(--size);
+		}
+		#value {
+			position: absolute;
+			top: 1rem;
+			left: 1rem;
+			color: green;
 		}
 	`;
 }
