@@ -1,6 +1,6 @@
 import { css, html, type HTMLTemplateResult, LitElement, type CSSResultGroup } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import type { Order } from "../types/market";
+import type { Order } from "../types/order";
 import "./ingredient_icon";
 import "./customer_shadow";
 import { styleMap } from "lit/directives/style-map.js";
@@ -40,11 +40,11 @@ export class OrderElement extends LitElement {
 		`;
 	}
 	private accept(): void {
-		const customEvent = new CustomEvent("curse-accept-order");
+		const customEvent = new CustomEvent("curse-accept-order", {detail: {}, composed: true});
 		this.dispatchEvent(customEvent);
 	}
 	private reject(): void {
-		const customEvent = new CustomEvent("curse-reject-order");
+		const customEvent = new CustomEvent("curse-reject-order", {composed: true});
 		this.dispatchEvent(customEvent);
 	}
 	public static styles?: CSSResultGroup = css`

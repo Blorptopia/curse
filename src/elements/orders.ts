@@ -1,6 +1,6 @@
 import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import type { Order } from "../types/market";
+import type { Order } from "../types/order";
 import "./order";
 import OrdersBackgroundURL from "../assets/orders_background.jpg";
 import { styleMap } from "lit/directives/style-map.js";
@@ -12,15 +12,18 @@ const MAX_PENDING_ORDERS = 7;
 export class OrdersElement extends LitElement {
 	@property({type: Array})
 	public orders: Order[];
+	@property({type: Boolean})
+	public hasActiveOrder: boolean;
 
 	public constructor() {
 		super();
 		this.orders = [];
+		this.hasActiveOrder = false;
 	}
 	protected render(): HTMLTemplateResult {
 	   	return html`
 			<div id="orders" style=${styleMap({backgroundImage: `url("${OrdersBackgroundURL}")`, "--max-pending-orders": MAX_PENDING_ORDERS})}>
-				${repeat(this.orders, order => order, this.renderOrder)}
+				${repeat(this.orders, order => order, (order, index) => this.renderOrder(order, index))}
 			</div>
 		`;
 	}
@@ -31,6 +34,7 @@ export class OrdersElement extends LitElement {
 		return html`
 			<curse-order
 				.order=${order}
+				.canAccept=${!this.hasActiveOrder}
 				style=${styleMap({
 					gridColumn: MAX_PENDING_ORDERS - orderIndex,
 					gridRow: 1

@@ -1,6 +1,6 @@
 import { type HTMLTemplateResult, LitElement, html, type CSSResultGroup, css } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import type { CustomerId } from "../types/market";
+import type { CustomerId } from "../types/customer";
 
 const ID_TO_IMAGES = {
 	GUSTAVO: "",

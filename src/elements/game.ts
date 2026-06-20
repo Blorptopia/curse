@@ -3,7 +3,8 @@ import { customElement, query, state } from "lit/decorators.js";
 import "./orders";
 import "./mixing_screen";
 import { INGREDIENTS } from "../data/ingredients";
-import type { CustomerId, Order, OrderTemplate } from "../types/market";
+import type { Order, OrderTemplate } from "../types/order";
+import type { CustomerId } from "../types/customer";
 import { MAX_ORDERS_PER_DAY } from "../config";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
@@ -15,6 +16,8 @@ export class GameElement extends LitElement {
 	private dayIndex: number;
 	@state()
 	private pendingOrders: Order[];
+	@state()
+	private activeOrder?: Order;
 	@state()
 	private deadCustomerIds: CustomerId[];
 
@@ -40,6 +43,7 @@ export class GameElement extends LitElement {
 					<button id="go-to-mixing-screen" class="navigation-button" @click=${() => this.gotoScreen("mixing")}>&gt;</button>
 					<curse-orders
 						.orders=${this.pendingOrders}
+						.hasActiveOrder=${this.activeOrder !== undefined}
 					></curse-orders>
 				</div>
 				<div class="screen-container" data-screen="mixing">
