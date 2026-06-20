@@ -1,6 +1,7 @@
 import { css, html, type HTMLTemplateResult, LitElement, type CSSResultGroup } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { IngredientId } from "../types/ingredient";
+import "./store";
 
 @customElement("curse-mixing-screen")
 export class MixingScreenElement extends LitElement {
@@ -13,6 +14,7 @@ export class MixingScreenElement extends LitElement {
 	}
 	protected render(): HTMLTemplateResult {
 	   	return html`
+			<div></div>
 			<curse-store .unlockedIngredientIds=${this.unlockedIngredientIds}></curse-store>
 		`; 
 	}
