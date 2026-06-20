@@ -27,14 +27,13 @@ export class CustomerShadowElement extends LitElement {
 
 	public static styles?: CSSResultGroup = css`
 		:host {
-			--height: 110;
-			--width: 233;
 			display: block;
-			aspect-ratio: 1 / 3;
+			height: 100%;
+			width: 100%;
 		}
 		img {
+			height: 100%;
 			width: 100%;
-			aspect-ratio: 1 / 3;
 		}
 	`;
 }

@@ -38,7 +38,6 @@ export class OrdersElement extends LitElement {
 				.showDetails=${orderIndex === 0}
 				style=${styleMap({
 					gridColumn: MAX_PENDING_ORDERS - orderIndex,
-					gridRow: 1
 				})}
 			></curse-order>
 		`;
@@ -46,18 +45,23 @@ export class OrdersElement extends LitElement {
 
 	public static styles?: CSSResultGroup = css`
 		:host {
-			display: contents;
+			display: block;
+			height: 100%;
+			width: 100%;
 		}
 		#orders {
 			display: grid;
 			grid-template-columns: repeat(var(--max-pending-orders), 1fr);
-			grid-template-rows: 1fr;
+			grid-template-rows: 2fr 9fr;
 			justify-content: flex-end;
 			width: 100%;
 			height: 100%;
 			padding: 5rem;
 			box-sizing: border-box;
 			gap: 1rem;
+		}
+		curse-order {
+			grid-row: 1 / 3;
 		}
 		#content {
 			background-size: cover;

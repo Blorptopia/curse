@@ -198,24 +198,20 @@ export class GameElement extends LitElement {
 			display: block;
 			height: 100%;
 			width: 100%;
-			overflow: hidden;
 		}
 		#screens {
 			display: grid;
 			grid-template-columns: repeat(2, 1fr);
 			width: 200%;
 			height: 100%;
+			overflow-x: hidden;
 		}
 		.screen-container {
 			display: block;
 			position: relative;
 			width: 100%;
-		}
-		curse-store {
-			grid-area: store;
-		}
-		curse-orders {
-			grid-area: orders;
+			height: 100vh;
+			overflow: initial;
 		}
 		.navigation-button {
 			position: absolute;

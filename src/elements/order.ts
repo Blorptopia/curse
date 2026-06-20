@@ -4,6 +4,7 @@ import { type AcceptOrderEventData, type RejectOrderEventData, type Order } from
 import "./ingredient_icon";
 import "./customer_shadow";
 import { styleMap } from "lit/directives/style-map.js";
+import { CUSTOMER_SHADOW_SIZE } from "../config";
 
 @customElement("curse-order")
 export class OrderElement extends LitElement {
@@ -39,7 +40,14 @@ export class OrderElement extends LitElement {
 					<button class="destructive" type="button" @click=${this.reject}>Reject</button>
 				</div>
 			</div>
-			<curse-customer-shadow .customerId=${this.order.customerId}></curse-customer-shadow>
+			<curse-customer-shadow
+				id="shadow"
+				.customerId=${this.order.customerId}
+				style=${styleMap({
+					"--source-height": CUSTOMER_SHADOW_SIZE.height,
+					"--source-width": CUSTOMER_SHADOW_SIZE.width
+				})}
+			></curse-customer-shadow>
 		`;
 	}
 	private accept(): void {
@@ -68,10 +76,12 @@ export class OrderElement extends LitElement {
 	}
 	public static styles?: CSSResultGroup = css`
 		:host {
-			display: flex;
-			flex-direction: column;
-			gap: 1rem;
-			justify-content: flex-end;
+			display: grid;
+
+
+			grid-template-columns: 1fr;
+			grid-template-rows: subgrid;
+			grid-template-areas: "details" "shadow";
 		}
 		#details:not([hidden]) {
 			background: white;
@@ -81,6 +91,8 @@ export class OrderElement extends LitElement {
 
 			display: flex;
 			flex-direction: column;
+			
+			grid-area: details;
 		}
 		#details-header {
 			display: flex;
@@ -97,6 +109,13 @@ export class OrderElement extends LitElement {
 		}
 		#value {
 			color: green;
+		}
+		#shadow {
+			--size-multiplier: .2rem;
+			height: calc(var(--source-height) * var(--size-multiplier));
+			width: calc(var(--source-width) * var(--size-multiplier));
+
+			grid-area: shadow;
 		}
 	`;
 }
