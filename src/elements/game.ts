@@ -110,20 +110,15 @@ export class GameElement extends LitElement {
 			},
 
 		];
+		const templates: OrderTemplate[] = [];
 		if (this.dayIndex === 0) {
-			return [
-				JACK_INTERACTIONS[0],
-			];
+			templates.push(JACK_INTERACTIONS[0]);
 		}
 		if (this.dayIndex === 1) {
-			return [
-				JACK_INTERACTIONS[1],
-			];
+			templates.push(JACK_INTERACTIONS[1]);
 		}
 		if (this.dayIndex === 2) {
-			return [
-				JACK_INTERACTIONS[1],
-			];
+			templates.push(JACK_INTERACTIONS[2]);
 		}
 
 		const RANDOM_ORDER_TEMPLATES: OrderTemplate[] = [
@@ -141,9 +136,9 @@ export class GameElement extends LitElement {
 			},
 		];
 		
-		const templates: OrderTemplate[] = [];
-		for (let i = 0; i < MAX_ORDERS_PER_DAY; i++) {
-			const template = RANDOM_ORDER_TEMPLATES[Math.random() * RANDOM_ORDER_TEMPLATES.length]!;
+		const desiredRandomOrderCount = MAX_ORDERS_PER_DAY - templates.length;
+		for (let i = 0; i < desiredRandomOrderCount; i++) {
+			const template = RANDOM_ORDER_TEMPLATES[Math.floor(Math.random() * RANDOM_ORDER_TEMPLATES.length)]!;
 			templates.push(template);
 		}
 		return templates;
