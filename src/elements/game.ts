@@ -54,6 +54,7 @@ export class GameElement extends LitElement {
 					<curse-mixing-screen
 						.unlockedIngredientIds=${ingredientIds}
 						.loanSharkPayment=${this.hasPaidLoanShark ? undefined : this.getLoanSharkPayment()}
+						.activeOrder=${this.activeOrder}
 					></curse-mixing-screen>
 				</div>
 			</div>
