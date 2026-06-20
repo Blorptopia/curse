@@ -82,6 +82,7 @@ export class OrderElement extends LitElement {
 			grid-template-columns: 1fr;
 			grid-template-rows: subgrid;
 			grid-template-areas: "details" "shadow";
+			justify-items: center;
 		}
 		#details:not([hidden]) {
 			background: white;
