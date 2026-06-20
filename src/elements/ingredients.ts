@@ -3,7 +3,7 @@ import { customElement, property } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
 import type { IngredientId } from "../types/ingredient";
 import { INGREDIENTS } from "../data/ingredients";
-import "./ingredient-icon";
+import "./ingredient_icon";
 
 @customElement("curse-ingredients")
 export class IngredientsElement extends LitElement {
