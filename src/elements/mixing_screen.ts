@@ -2,6 +2,7 @@ import { css, html, type HTMLTemplateResult, LitElement, type CSSResultGroup } f
 import { customElement, property } from "lit/decorators.js";
 import type { IngredientId } from "../types/ingredient";
 import "./store";
+import "./hot_plate";
 
 @customElement("curse-mixing-screen")
 export class MixingScreenElement extends LitElement {
@@ -14,16 +15,36 @@ export class MixingScreenElement extends LitElement {
 	}
 	protected render(): HTMLTemplateResult {
 	   	return html`
-			<div></div>
 			<curse-store .unlockedIngredientIds=${this.unlockedIngredientIds}></curse-store>
+			<div id="hot-plate-container">
+				<curse-hot-plate></curse-hot-plate>
+			</div>
 		`; 
 	}
 	static styles?: CSSResultGroup = css`
 		:host {
-			display: grid;
-			grid-template-columns: 3fr 1fr;
+			position: relative;
 
+			display: block;
 			height: 100%;
+			width: 100%;
+		}
+		curse-store {
+			position: absolute;
+			width: 25%;
+			height: 100%;
+			box-sizing: border-box;
+			right: 0;
+		}
+		#hot-plate-container {
+			position: absolute;
+			bottom: 0;
+			width: 100%;
+
+			display: flex;
+			justify-content: center;
+
+			padding: 1rem;
 		}
 	`;
 }

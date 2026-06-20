@@ -215,6 +215,7 @@ export class GameElement extends LitElement {
 		}
 		.navigation-button {
 			position: absolute;
+			z-index: 100;
 			top: 0.1rem;
 
 			font-size: 2rem;
