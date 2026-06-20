@@ -13,7 +13,7 @@ export class MixingScreenElement extends LitElement {
 	}
 	protected render(): HTMLTemplateResult {
 	   	return html`
-			<curse-shop .unlockedIngredientIds=${this.unlockedIngredientIds}></curse-shop>
+			<curse-store .unlockedIngredientIds=${this.unlockedIngredientIds}></curse-store>
 		`; 
 	}
 	static styles?: CSSResultGroup = css`
