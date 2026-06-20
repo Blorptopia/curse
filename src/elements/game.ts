@@ -17,6 +17,8 @@ export class GameElement extends LitElement {
 			display: grid;
 			grid-template-columns: 1fr 3fr 1fr;
 			grid-template-areas: "market board ingredients";
+
+			height: 100%;
 		}
 		curse-ingredients {
 			grid-area: ingredients;

@@ -4,6 +4,7 @@ export type IngredientInfo = {
 	name: string;
 	description: string;
 	effects: IngredientEffects;
+	price: number;
 };
 
 type IngredientEffects = {};

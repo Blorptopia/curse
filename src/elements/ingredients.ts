@@ -26,16 +26,32 @@ export class IngredientsElement extends LitElement {
 	private renderIngredient(ingredientId: IngredientId): HTMLTemplateResult {
 		const info = INGREDIENTS[ingredientId];
 		return html`
-			<div id="ingredient">
-				<span class="title">${info.name}</span>
+			<div class="ingredient">
 				<curse-ingredient-icon .ingredientId=${ingredientId}></curse-ingredient-icon>
+				<span class="title">${info.name}</span>
+				<span class="price">${info.price}$</span>
 			</div>
 		`;
 	}
 	public static styles?: CSSResultGroup = css`
+		:host {
+			background: brown;
+			padding: 1rem;
+		}
 		#ingredients {
 			display: flex;
 			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.ingredient {
+			position: relative;
+		}
+		.price {
+			position: absolute;
+			right: .1rem;
+			bottom: 1.1rem;
+			color: green;
 		}
 
 		curse-ingredient-icon {
