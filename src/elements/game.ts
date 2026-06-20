@@ -20,6 +20,8 @@ export class GameElement extends LitElement {
 	private activeOrder?: Order;
 	@state()
 	private deadCustomerIds: CustomerId[];
+	@state()
+	private hasPaidLoanShark: boolean;
 
 	// Elements
 	@query(`[data-screen="orders"]`)
@@ -33,6 +35,7 @@ export class GameElement extends LitElement {
 		this.dayIndex = 0;
 		this.deadCustomerIds = [];
 		this.pendingOrders = this.createOrders();
+		this.hasPaidLoanShark = false;
 	}
 
 	protected render(): HTMLTemplateResult {
@@ -50,6 +53,7 @@ export class GameElement extends LitElement {
 					<button id="go-to-orders" class="navigation-button" @click=${() => this.gotoScreen("orders")}>&lt;</button>
 					<curse-mixing-screen
 						.unlockedIngredientIds=${ingredientIds}
+						.loanSharkPayment=${this.hasPaidLoanShark ? undefined : this.getLoanSharkPayment()}
 					></curse-mixing-screen>
 				</div>
 			</div>
@@ -169,6 +173,21 @@ export class GameElement extends LitElement {
 		}
 		const baseValue = 150;
 		return baseValue - (this.dayIndex * 10);
+	}
+	private getLoanSharkPayment(): number {
+		if (this.dayIndex === 0) {
+			return 50;
+		}
+		if (this.dayIndex === 1) {
+			return 150;
+		}
+		if (this.dayIndex === 2) {
+			return 250;
+		}
+		if (this.dayIndex === 3) {
+			return 350;
+		}
+		return 550;
 	}
 
 	public static styles?: CSSResultGroup = css`
