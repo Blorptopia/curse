@@ -11,10 +11,13 @@ export class OrderElement extends LitElement {
 	public order?: Order;
 	@property({type: Boolean})
 	public canAccept: boolean;
+	@property({type: Boolean})
+	public showDetails: boolean;
 
 	public constructor() {
 		super();
 		this.canAccept = true;
+		this.showDetails = true;
 	}
 
 	public render(): HTMLTemplateResult {
@@ -22,7 +25,7 @@ export class OrderElement extends LitElement {
 			return html``;
 		}
 		return html`
-			<div id="details">
+			<div id="details" ?hidden=${!this.showDetails}>
 				<div id="details-header">
 					<h1 id="name">${this.order.name}</h1>
 					<div>
@@ -70,7 +73,7 @@ export class OrderElement extends LitElement {
 			gap: 1rem;
 			justify-content: flex-end;
 		}
-		#details {
+		#details:not([hidden]) {
 			background: white;
 			color: black;
 			border-radius: 2rem;

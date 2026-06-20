@@ -35,6 +35,7 @@ export class OrdersElement extends LitElement {
 			<curse-order
 				.order=${order}
 				.canAccept=${!this.hasActiveOrder}
+				.showDetails=${orderIndex === 0}
 				style=${styleMap({
 					gridColumn: MAX_PENDING_ORDERS - orderIndex,
 					gridRow: 1
