@@ -3,7 +3,7 @@ import { customElement, query, state } from "lit/decorators.js";
 import "./orders";
 import "./mixing_screen";
 import { INGREDIENTS } from "../data/ingredients";
-import type { Order, OrderTemplate } from "../types/order";
+import type { AcceptOrderEventData, Order, OrderTemplate } from "../types/order";
 import type { CustomerId } from "../types/customer";
 import { MAX_ORDERS_PER_DAY } from "../config";
 
@@ -47,6 +47,13 @@ export class GameElement extends LitElement {
 					<curse-orders
 						.orders=${this.pendingOrders}
 						.hasActiveOrder=${this.activeOrder !== undefined}
+						@curse-accept-order=${(event: CustomEvent<AcceptOrderEventData>) => {
+							this.activeOrder = this.pendingOrders.find(order => order.id === event.detail.orderId);
+							this.pendingOrders = this.pendingOrders.filter(order => order.id !== event.detail.orderId);
+						}}
+						@curse-reject-order=${(event: CustomEvent<AcceptOrderEventData>) => {
+							this.pendingOrders = this.pendingOrders.filter(order => order.id !== event.detail.orderId);
+						}}
 					></curse-orders>
 				</div>
 				<div class="screen-container" data-screen="mixing">
@@ -105,17 +112,17 @@ export class GameElement extends LitElement {
 		];
 		if (this.dayIndex === 0) {
 			return [
-					JACK_INTERACTIONS[0],
+				JACK_INTERACTIONS[0],
 			];
 		}
 		if (this.dayIndex === 1) {
 			return [
-					JACK_INTERACTIONS[1],
+				JACK_INTERACTIONS[1],
 			];
 		}
 		if (this.dayIndex === 2) {
 			return [
-					JACK_INTERACTIONS[1],
+				JACK_INTERACTIONS[1],
 			];
 		}
 

@@ -19,3 +19,9 @@ export type OrderTemplate = Omit<Omit<Order, "value">, "id"> & {
 	baseValue: number;
 };
 
+export type AcceptOrderEventData = {
+	orderId: string;
+}
+export type RejectOrderEventData = {
+	orderId: string;
+}
