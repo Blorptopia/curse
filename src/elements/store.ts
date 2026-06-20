@@ -27,7 +27,7 @@ export class StoreElement extends LitElement {
 	private renderIngredient(ingredientId: IngredientId): HTMLTemplateResult {
 		const info = INGREDIENTS[ingredientId];
 		return html`
-			<div class="ingredient">
+			<div class="ingredient-listing" ?hidden=${!this.unlockedIngredientIds.includes(ingredientId)}>
 				<curse-ingredient-icon .ingredientId=${ingredientId}></curse-ingredient-icon>
 				<span class="title">${info.name}</span>
 				<span class="price">${info.price}$</span>
@@ -45,7 +45,7 @@ export class StoreElement extends LitElement {
 			gap: 1rem;
 		}
 
-		.ingredient {
+		.ingredient-listing {
 			position: relative;
 		}
 		.price {

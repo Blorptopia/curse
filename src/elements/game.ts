@@ -14,7 +14,7 @@ export class GameElement extends LitElement {
 				id: crypto.randomUUID(),
 				customerId: "GUSTAVO",
 				value: 50,
-				ingredientIds: ["BLUE_PILL"]
+				ingredientIds: ["BLUE_PILL", "RED_PILL"]
 			}
 		];
 	   	return html`

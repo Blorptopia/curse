@@ -44,6 +44,7 @@ export class OrderElement extends LitElement {
 			padding: .25rem;
 
 			display: flex;
+			gap: .2rem;
 		}
 		curse-ingredient-icon {
 			display: block;

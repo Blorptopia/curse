@@ -1,12 +1,19 @@
 import type { IngredientInfo } from "../types/ingredient";
 
-const BLUE_PILL_INGREDIENT: IngredientInfo = {
+const BLUE_PILL: IngredientInfo = {
 	name: "Blue pill",
-	description: "",
+	description: "Oh no not again",
 	effects: {},
 	price: 50
 };
+const RED_PILL: IngredientInfo = {
+	name: "Red pill",
+	description: "Mmm tasty",
+	effects: {},
+	price: 80
+};
 export const INGREDIENTS = {
-	BLUE_PILL: BLUE_PILL_INGREDIENT
+	BLUE_PILL,
+	RED_PILL
 } as const;
 
