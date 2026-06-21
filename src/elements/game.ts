@@ -277,6 +277,8 @@ export class GameElement extends LitElement {
 			display: flex;
 			justify-content: center;
 
+			pointer-events: none;
+
 			curse-customer-portrait {
 				--size-multiplier: .35rem;
 				anchor-name: --active-customer;
