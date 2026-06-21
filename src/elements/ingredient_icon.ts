@@ -36,7 +36,7 @@ export class IngredientIconElement extends LitElement {
 			height: 100%;
 			width: 100%;
 			object-fit: contain;
-			object-position: bottom center;
+			object-position: center center;
 
 			image-rendering: pixelated;
 		}

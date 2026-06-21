@@ -25,6 +25,7 @@ export class CupElement extends LitElement {
 			height: 100%;
 			width: 100%;
 			object-fit: contain;
+			object-position: bottom center;
 
 			image-rendering: pixelated;
 		}
