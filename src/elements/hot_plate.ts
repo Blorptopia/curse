@@ -2,7 +2,7 @@ import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css } f
 import { customElement, state } from "lit/decorators.js";
 import HotPlateURL from "../assets/hot_plate/base.png";
 import HotPlateUnpressedButtonURL from "../assets/cup.png";
-import HotPlatePressedButtonURL from "../assets/cup.png";
+import HotPlatePressedButtonURL from "../assets/hot_plate/button/pressed.png";
 import PressAudio1URL from "../assets/hot_plate/button/press/1.wav";
 import PressAudio2URL from "../assets/hot_plate/button/press/2.wav";
 import PressAudio3URL from "../assets/hot_plate/button/press/3.wav";
