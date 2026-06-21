@@ -3,6 +3,16 @@ import { customElement, state } from "lit/decorators.js";
 import HotPlateURL from "../assets/hot_plate/base.png";
 import HotPlateUnpressedButtonURL from "../assets/cup.png";
 import HotPlatePressedButtonURL from "../assets/cup.png";
+import PressAudio1URL from "../assets/hot_plate/button/press/1.wav";
+import PressAudio2URL from "../assets/hot_plate/button/press/2.wav";
+import PressAudio3URL from "../assets/hot_plate/button/press/3.wav";
+
+const PRESS_AUDIO_URLS: string[] = [
+	PressAudio1URL,
+	PressAudio2URL,
+	PressAudio3URL
+];
+const PRESS_AUDIOS = PRESS_AUDIO_URLS.map(url => new Audio(url));
 
 @customElement("curse-hot-plate")
 export class HotPlateElement extends LitElement {
@@ -19,19 +29,12 @@ export class HotPlateElement extends LitElement {
 			<img
 				class="base"
 				src=${HotPlateURL}
+				draggable="false"
 				alt
-				@mousedown=${() => {
-					this.pressed = true;
-				}}
-				@mouseup=${() => {
-					this.pressed = false;
-				}}
-				@touchstart=${() => {
-					this.pressed = true;
-				}}
-				@touchend=${() => {
-					this.pressed = false;
-				}}
+				@mousedown=${this.press}
+				@mouseup=${this.release}
+				@touchstart=${this.press}
+				@touchend=${this.release}
 			>
 			<img
 				?data-pressed=${this.pressed}
@@ -40,6 +43,15 @@ export class HotPlateElement extends LitElement {
 				alt
 			>
 		`; 
+	}
+	private press(): void {
+		this.pressed = true;
+		
+		const audio = PRESS_AUDIOS[Math.floor(Math.random() * PRESS_AUDIOS.length)];
+		audio.play();
+	}
+	private release(): void {
+		this.pressed = false;
 	}
 	public static styles?: CSSResultGroup = css`
 		:host {
