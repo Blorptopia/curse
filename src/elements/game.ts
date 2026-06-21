@@ -10,6 +10,7 @@ import type { Order, OrderTemplate } from "../types/order";
 import { MAX_ORDERS_PER_DAY } from "../config";
 import type { CustomerId } from "../types/customer";
 import { styleMap } from "lit/directives/style-map.js";
+import { CUSTOMER_ID_TO_NAME } from "../data/customer";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -38,7 +39,8 @@ export class GameElement extends LitElement {
 			<section id="window-frame">
 				<div id="left-window" class="window"></div>
 				<div id="right-window" class="window"></div>
-
+				
+				${this.orders.length === 0 ? this.renderCustomer(this.dayIndex === 0 ? "LOANS_HARK_PRE_EXPLOSION" : "LOANS_HARK", 0) : null}
 				${map(this.orders, (order, index) => this.renderCustomer(order.customerId, index))}
 				${this.renderDialog()}
 				<div id="hot-plate-container">
@@ -80,15 +82,16 @@ export class GameElement extends LitElement {
 	}
 	private renderDialog(): HTMLTemplateResult {
 		const activeOrder = this.orders[0];
+		const canDecline = this.dayIndex !== 0;
 
 		if (activeOrder !== undefined) {
 			const dialogPages = activeOrder.description?.length ?? 0;
-			const currentDialogPage = activeOrder.description?.[this.dialogIndex] ?? "";
+			const currentDialogPage = activeOrder.description?.[this.dialogIndex] ?? activeOrder.name;
 			const hasMorePages = dialogPages > this.dialogIndex + 1;
 			return html`
 				<div id="dialog">
 					<div id="dialog-heading">
-						<h1>${activeOrder.name}</h1>
+						<h1>${CUSTOMER_ID_TO_NAME[activeOrder.customerId]}</h1>
 						<div id="target-color" style=${styleMap({backgroundColor: activeOrder.targetColor})}></div>
 					</div>
 					<p>${currentDialogPage}</p>
@@ -112,13 +115,39 @@ export class GameElement extends LitElement {
 									];
 									this.dialogIndex = 0;
 								}}
+								?hidden=${!canDecline}
 							>Reject</button>
 						`}
 					</div>
 				</div>
 			`
 		}
-		return html``
+		const payment = this.getLoanSharkPayment();
+		if (this.dayIndex === 0) {
+			return html`
+				<div id="dialog">
+					<div id="dialog-heading">
+						<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK_PRE_EXPLOSION"]}</h1>
+						<div id="target-color" style=${styleMap({backgroundColor: "#f00"})}></div>
+					</div>
+					<p>Dialoge here</p>
+				</div>
+			`
+		}
+
+		return html`
+			<div id="dialog">
+				<div id="dialog-heading">
+					<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK_PRE_EXPLOSION"]}</h1>
+					<div id="target-color" style=${styleMap({backgroundColor: "#f00"})}></div>
+				</div>
+				<p>I'm here for my daily payment of <span class="price">${payment}</span></p>
+				<div id="actions">
+					<button class="primary">Pay</button>
+					<button class="destructive">Reject</button>
+				</div>
+			</div>
+		`
 	}
 	private createOrderTemplates(): OrderTemplate[] {
 		const JACK_INTERACTIONS: OrderTemplate[] = [
