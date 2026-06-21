@@ -5,6 +5,7 @@ import "./hot_plate";
 import "./cup";
 import "./ingredient_icon";
 import "./customer_shadow";
+import "./flask";
 import { map } from "lit/directives/map.js";
 import type { Order, OrderTemplate } from "../types/order";
 import { MAX_ORDERS_PER_DAY } from "../config";
@@ -13,6 +14,8 @@ import { styleMap } from "lit/directives/style-map.js";
 import { CUSTOMER_ID_TO_NAME } from "../data/customer";
 import { INGREDIENTS } from "../data/ingredients";
 import type { IngredientId } from "../types/ingredient";
+import type { ItemId } from "../types/item";
+import { ITEMS } from "../data/items";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -26,6 +29,8 @@ export class GameElement extends LitElement {
 	private deadCustomerIds: CustomerId[];
 	@state()
 	private dialogIndex: number;
+	@state()
+	private productPurchaseCount: Partial<Record<ItemId | IngredientId, number>>;
 
 	public constructor() {
 		super();
@@ -34,6 +39,7 @@ export class GameElement extends LitElement {
 		this.deadCustomerIds = [];
 		this.orders = this.createOrders();
 		this.dialogIndex = 0;
+		this.productPurchaseCount = {};
 	}
 
 	protected render(): HTMLTemplateResult {
@@ -50,8 +56,8 @@ export class GameElement extends LitElement {
 				</div>
 			</section>
 			<section id="shelf">
-				<div id="essentials-row" class="shelf-row">
-					<curse-cup></curse-cup>
+				<div id="items-row" class="shelf-row">
+					${map(Object.keys(ITEMS) as ItemId[], itemId => this.renderItemListing(itemId))}
 				</div>
 				<div id="ingredients-row" class="shelf-row">
 					${map(Object.keys(INGREDIENTS) as IngredientId[], ingredientId => this.renderIngredientListing(ingredientId))}
@@ -97,6 +103,39 @@ export class GameElement extends LitElement {
 					</dl>
 				</div>
 				<curse-ingredient-icon ingredientid=${ingredientId}></curse-ingredient-icon>
+			</div>
+		`
+
+	}
+	private renderItemListing(itemId: ItemId): HTMLTemplateResult {
+		const item = ITEMS[itemId];
+
+		let itemIconFragment: HTMLTemplateResult | undefined;
+
+		if (itemId === "SOLO_CUP") {
+			itemIconFragment = html`<curse-cup class="icon"></curse-cup>`;
+		}
+		if (itemId === "CONICAL_FLASK") {
+			itemIconFragment = html`<curse-flask class="icon" disabled></curse-flask>`;
+		}
+
+		return html`
+			<div
+				class="listing"
+				style=${styleMap({
+					anchorName: `--listing-${itemId}`
+				})}
+			>
+				<div
+					class="listing-details"
+					style=${styleMap({
+						positionAnchor: `--listing-${itemId}`
+					})}
+				>
+					<h1>${item.name}</h1>
+					<p>${item.description}</p>
+				</div>
+				${itemIconFragment}
 			</div>
 		`
 

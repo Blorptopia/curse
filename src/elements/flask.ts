@@ -1,22 +1,32 @@
-import { css, html, LitElement, svg, type CSSResultGroup, type HTMLTemplateResult, type PropertyValues, type SVGTemplateResult } from "lit";
-import { customElement, property, query, state } from "lit/decorators.js";
-import type { LiquidLayer } from "../types/bottle";
+import { css, html, LitElement, svg, type CSSResultGroup, type HTMLTemplateResult, type SVGTemplateResult } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
+import type { LiquidLayer } from "../types/flask";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import Color from "color";
-@customElement("curse-bottle")
-export class BottleElement extends LitElement {
+import FlaskURL from "../assets/flask/conical/image.png";
+import FlaskMaskURL from "../assets/flask/conical/mask.png";
 
+@customElement("curse-flask")
+export class FlaskElement extends LitElement {
+	// Props
 	@property({ type: Array })
 	public layers: LiquidLayer[];
-
+	@property({type: String})
+	public src: string;
+	@property({type: String})
+	public maskSrc: string;
+	@property({type: Boolean})
+	public disabled: boolean;
+	
+	// State
+	@state()
+	private angle: number;
+	
+	// Attributes
 	private resizeController: ResizeController<DOMRectReadOnly>;
 	private contentRect: DOMRectReadOnly;
 	private diameter: number;
 	private margin: number;
-
-	@state()
-	private angle: number;
-
 	private isRotating: boolean;
 
 	public constructor() {
@@ -36,6 +46,10 @@ export class BottleElement extends LitElement {
 				height: 3,
 			},
 		];
+		this.src = FlaskURL;
+		this.maskSrc = FlaskMaskURL;
+		this.disabled = false;
+
 		this.resizeController = new ResizeController(this, {
 			callback: (entries) => {
 				if (entries.length > 0) {
@@ -101,7 +115,7 @@ export class BottleElement extends LitElement {
 	}
 
 	private onMouseMove(event: MouseEvent) {
-		if (this.isRotating) {
+		if (this.isRotating && !this.disabled) {
 			this.angle += (event.movementX + event.movementY) / 10;
 		}
 	}
@@ -123,11 +137,11 @@ export class BottleElement extends LitElement {
 				@mousemove=${this.onMouseMove}
 			>
 				<mask id="bottle-mask">
-					<image x=${bottleX} y=${bottleY} height=${this.diameter} href="/src/assets/mixing/bottle_mask.png" class="bottle" transform="rotate(${this.angle})"/>
+					<image x=${bottleX} y=${bottleY} height=${this.diameter} href=${this.maskSrc} class="bottle" transform="rotate(${this.angle})"/>
 				</mask>
 				${this.drawLayers()}
 
-				<image x=${bottleX} y=${bottleY} height=${this.diameter} href="/src/assets/mixing/bottle.png" class="bottle" transform="rotate(${this.angle})"/>
+				<image x=${bottleX} y=${bottleY} height=${this.diameter} href=${this.src} class="bottle" transform="rotate(${this.angle})"/>
 			</svg>
 		`;
 	}
