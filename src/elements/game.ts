@@ -105,16 +105,24 @@ export class GameElement extends LitElement {
 				--size-multiplier: .17rem;
 			}
 		}
-		#cup-on-table-container {
-			position: absolute;
-			bottom: 1rem;
-			left: .5rem;
-		}
 		curse-cup {
 			--size-multiplier: .14rem;
 		}
 		curse-ingredient-icon {
 			--size-multiplier: 0.08rem;
+		}
+		@media (max-width: 900px) {
+			#window-frame {
+				border-top: none;
+				border-left: none;
+				border-right: none;
+			}
+			.window {
+				display: none;
+			}
+			#space-saving-row {
+				display: flex;
+			}
 		}
 	`;
 }
