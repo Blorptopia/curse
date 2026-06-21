@@ -11,6 +11,8 @@ import { MAX_ORDERS_PER_DAY } from "../config";
 import type { CustomerId } from "../types/customer";
 import { styleMap } from "lit/directives/style-map.js";
 import { CUSTOMER_ID_TO_NAME } from "../data/customer";
+import { INGREDIENTS } from "../data/ingredients";
+import type { IngredientId } from "../types/ingredient";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -52,11 +54,52 @@ export class GameElement extends LitElement {
 					<curse-cup></curse-cup>
 				</div>
 				<div id="ingredients-row" class="shelf-row">
-					<curse-ingredient-icon ingredientid="BLUE_PILL"></curse-ingredient-icon>
-					<curse-ingredient-icon ingredientid="RED_PILL"></curse-ingredient-icon>
+					${map(Object.keys(INGREDIENTS) as IngredientId[], ingredientId => this.renderIngredientListing(ingredientId))}
 				</div>
 			</section>
 		`
+	}
+	private renderIngredientListing(ingredientId: IngredientId): HTMLTemplateResult {
+		const ingredient = INGREDIENTS[ingredientId];
+
+		const factFragments: HTMLTemplateResult[] = [];
+
+		factFragments.push(html`
+			<dt>Price</dt>
+			<dd class="price">${ingredient.price}$</dd>
+	   	`);
+
+		if (ingredient.effects.explodesWhenMixedWith !== undefined) {
+			factFragments.push(html`
+				<dt>Explodes when mixed with</dt>
+				${ingredient.effects.explodesWhenMixedWith?.map(ingredientId => html`<dd>${INGREDIENTS[ingredientId].name}`)}
+			`);
+		}
+
+		return html`
+			<div
+				class="listing"
+				style=${styleMap({
+					anchorName: `--listing-${ingredientId}`
+				})}
+			>
+				<div
+					class="listing-details"
+					style=${styleMap({
+						positionAnchor: `--listing-${ingredientId}`
+					})}
+				>
+					<h1>${ingredient.name}</h1>
+					<p>${ingredient.description}</p>
+					<h2>Ingredient facts</h2>
+					<dl>
+						${factFragments}
+					</dl>
+				</div>
+				<curse-ingredient-icon ingredientid=${ingredientId}></curse-ingredient-icon>
+			</div>
+		`
+
 	}
 	private renderCustomer(customerId: CustomerId, orderIndex: number): HTMLTemplateResult {
 		if (orderIndex > 4) {
@@ -412,6 +455,26 @@ export class GameElement extends LitElement {
 				width: var(--size);
 				border-radius: 50%;
 			}
+		}
+		.listing-details {
+			position: absolute;
+			position-area: top center;
+
+			width: max-content;
+
+			background: white;
+			color: black;
+			padding: 1rem;
+			border-radius: 1rem;
+		}
+		.listing:not(:hover) > .listing-details {
+			display: none;
+		}
+		.price {
+			color: green;
+		}
+		dt {
+			font-weight: bold;
 		}
 	`;
 }

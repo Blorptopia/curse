@@ -9,7 +9,9 @@ const BLUE_PILL: IngredientInfo = {
 const RED_PILL: IngredientInfo = {
 	name: "Red pill",
 	description: "Mmm tasty",
-	effects: {},
+	effects: {
+		explodesWhenMixedWith: ["RED_PILL", "BLUE_PILL"]
+	},
 	price: 80
 };
 export const INGREDIENTS = {

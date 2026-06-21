@@ -7,4 +7,6 @@ export type IngredientInfo = {
 	price: number;
 };
 
-type IngredientEffects = {};
+type IngredientEffects = {
+	explodesWhenMixedWith?: IngredientId[];
+};
