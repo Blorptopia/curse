@@ -109,6 +109,7 @@ export class HotPlateElement extends LitElement {
 			];
 			if (allowedNewState.includes(this.state)) {
 				this.fireAudio.play();
+				console.log("FIRE");
 			}
 		}
 		if (this.state === "deactivating") {

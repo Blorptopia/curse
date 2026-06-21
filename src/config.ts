@@ -9,4 +9,4 @@ export const CUSTOMER_PORTRAIT_SIZE: ObjectSizing = {
 	height: 200,
 	width: 133
 };
-export const IGNITION_OFFSET_MS: number = 17;
+export const IGNITION_OFFSET_MS: number = 200;
