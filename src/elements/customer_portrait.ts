@@ -2,9 +2,11 @@ import { type HTMLTemplateResult, LitElement, html, type CSSResultGroup, css } f
 import { customElement, property } from "lit/decorators.js";
 import type { CustomerId } from "../types/customer";
 
+import JackURL from "../assets/customers/jack/portrait.png";
+
 const ID_TO_IMAGES = {
 	GUSTAVO: "",
-	JACK: ""
+	JACK: JackURL
 } satisfies Record<CustomerId, string>;
 
 @customElement("curse-customer-portrait")
@@ -26,14 +28,18 @@ export class CustomerPortraitElement extends LitElement {
 	public static styles?: CSSResultGroup = css`
 		:host {
 			display: block;
+			height: 100%;
 			width: 100%;
-			--height: 1;
-			--width: 0.67;
-			aspect-ratio: var(--width) / var(--height);
+
 		}
 		img {
+			display: block;
+			height: 100%;
 			width: 100%;
-			aspect-ratio: var(--width) / var(--height);
+			object-fit: contain;
+			object-position: bottom center;
+
+			image-rendering: pixelated;
 		}
 	`;
 }
