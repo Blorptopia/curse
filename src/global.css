@@ -1,8 +1,11 @@
 :root {
 	background-color: #16171d;
-	height: 100%;
 	color-scheme: dark;
 }
+html {
+	height: 100%;
+}
+
 body {
 	height: 100%;
 	margin: 0;

@@ -11,6 +11,8 @@
     "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
+    "@lit-labs/observers": "^2.1.0",
+    "color": "^5.0.3",
     "lit": "^3.3.2"
   },
   "devDependencies": {
