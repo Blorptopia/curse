@@ -28,16 +28,16 @@ export class CustomerPortraitElement extends LitElement {
 	public static styles?: CSSResultGroup = css`
 		:host {
 			display: block;
-			height: 100%;
-			width: 100%;
-
+			--source-height: 200;
+			--source-width: 133;
+			height: calc(var(--source-height) * var(--size-multiplier));
+			width: calc(var(--source-width) * var(--size-multiplier));
 		}
 		img {
 			display: block;
 			height: 100%;
 			width: 100%;
 			object-fit: contain;
-			object-position: bottom center;
 
 			image-rendering: pixelated;
 		}

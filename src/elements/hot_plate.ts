@@ -15,8 +15,10 @@ export class HotPlateElement extends LitElement {
 	public static styles?: CSSResultGroup = css`
 		:host {
 			display: block;
-			height: 100%;
-			width: 100%;
+			--source-height: 61;
+			--source-width: 196;
+			height: calc(var(--source-height) * var(--size-multiplier));
+			width: calc(var(--source-width) * var(--size-multiplier));
 		}
 		img {
 			display: block;

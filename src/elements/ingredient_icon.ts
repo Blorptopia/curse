@@ -26,14 +26,19 @@ export class IngredientIconElement extends LitElement {
 	public static styles?: CSSResultGroup = css`
 		:host {
 			display: block;
-			height: 100%;
-			width: 100%;
-			aspect-ratio: 1;
+			--source-height: 100;
+			--source-width: 100;
+			height: calc(var(--source-height) * var(--size-multiplier));
+			width: calc(var(--source-width) * var(--size-multiplier));
 		}
 		img {
+			display: block;
 			height: 100%;
 			width: 100%;
-			aspect-ratio: 1;
+			object-fit: contain;
+			object-position: bottom center;
+
+			image-rendering: pixelated;
 		}
 	`;
 }
