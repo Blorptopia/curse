@@ -79,7 +79,8 @@ export class GameElement extends LitElement {
 		}
 		#customer-container {
 			position: absolute;
-			bottom: 0rem;
+			left: 0;
+			bottom: 0;
 			width: 100%;
 			overflow-y: hidden;
 			z-index: -100;
