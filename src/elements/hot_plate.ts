@@ -12,13 +12,14 @@ const PRESS_AUDIO_URLS: string[] = [
 	PressAudio2URL,
 	PressAudio3URL
 ];
-const PRESS_AUDIOS = PRESS_AUDIO_URLS.map(url => new Audio(url));
+// Preload the clips
+PRESS_AUDIO_URLS.map(url => new Audio(url));
 
 @customElement("curse-hot-plate")
 export class HotPlateElement extends LitElement {
 	@state()
 	private pressed: boolean;
-
+	
 	public constructor() {
 		super();
 		this.pressed = false;
@@ -47,7 +48,9 @@ export class HotPlateElement extends LitElement {
 	private press(): void {
 		this.pressed = true;
 		
-		const audio = PRESS_AUDIOS[Math.floor(Math.random() * PRESS_AUDIOS.length)];
+		const audioUrl = PRESS_AUDIO_URLS[Math.floor(Math.random() * PRESS_AUDIO_URLS.length)];
+		const audio = new Audio(audioUrl);
+		audio.volume = .5;
 		audio.play();
 	}
 	private release(): void {
