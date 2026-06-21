@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@lit-labs/observers": "^2.1.0",
+    "@lit/task": "^1.0.3",
     "color": "^5.0.3",
     "lit": "^3.3.2"
   },

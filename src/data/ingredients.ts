@@ -14,8 +14,16 @@ const RED_PILL: IngredientInfo = {
 	},
 	price: 80
 };
+const BURGER: IngredientInfo = {
+	name: "Burger",
+	description: "One who burgs",
+	effects: {
+	},
+	price: 10
+};
 export const INGREDIENTS = {
 	BLUE_PILL,
-	RED_PILL
+	RED_PILL,
+	BURGER
 } as const;
 

@@ -6,23 +6,45 @@ import HotPlatePressedButtonURL from "../assets/hot_plate/button/pressed.png";
 import PressAudio1URL from "../assets/hot_plate/button/press/1.wav";
 import PressAudio2URL from "../assets/hot_plate/button/press/2.wav";
 import PressAudio3URL from "../assets/hot_plate/button/press/3.wav";
+import ReleaseAudio1URL from "../assets/hot_plate/button/release/1.wav";
+import ReleaseAudio2URL from "../assets/hot_plate/button/release/2.wav";
+import ReleaseAudio3URL from "../assets/hot_plate/button/release/3.wav";
+import FireAudioURL from "../assets/hot_plate/fire.wav";
+import { IGNITION_OFFSET_MS } from "../config";
 
 const PRESS_AUDIO_URLS: string[] = [
 	PressAudio1URL,
 	PressAudio2URL,
 	PressAudio3URL
 ];
-// Preload the clips
-PRESS_AUDIO_URLS.map(url => new Audio(url));
+const RELEASE_AUDIO_URLS: string[] = [
+	ReleaseAudio1URL,
+	ReleaseAudio2URL,
+	ReleaseAudio3URL
+];
 
 @customElement("curse-hot-plate")
 export class HotPlateElement extends LitElement {
 	@state()
-	private pressed: boolean;
-	
+	private state: HotPlateState;
+	@state()
+	private desiredToBePressed: boolean;
+
+	// Attributes
+	private pressAudios: HTMLAudioElement[];
+	private releaseAudios: HTMLAudioElement[];
+	private fireAudio: HTMLAudioElement;
+
 	public constructor() {
 		super();
-		this.pressed = false;
+		this.state = "unpressed";
+		this.desiredToBePressed = false;
+
+		this.pressAudios = PRESS_AUDIO_URLS.map(url => new Audio(url));
+		this.releaseAudios = RELEASE_AUDIO_URLS.map(url => new Audio(url));
+		this.fireAudio = new Audio(FireAudioURL);
+		this.fireAudio.loop = true;
+		this.fireAudio.volume = .3;
 	}
 
 	protected render(): HTMLTemplateResult {
@@ -32,29 +54,80 @@ export class HotPlateElement extends LitElement {
 				src=${HotPlateURL}
 				draggable="false"
 				alt
-				@mousedown=${this.press}
-				@mouseup=${this.release}
-				@touchstart=${this.press}
-				@touchend=${this.release}
+				@mousedown=${this.humanPress}
+				@mouseup=${this.humanRelease}
+				@touchstart=${this.humanPress}
+				@touchend=${this.humanRelease}
 			>
 			<img
-				?data-pressed=${this.pressed}
+				data-state=${this.state}
 				class="button"
-				src=${this.pressed ? HotPlatePressedButtonURL : HotPlateUnpressedButtonURL}
+				src=${["activating", "pressed"].includes(this.state) ? HotPlatePressedButtonURL : HotPlateUnpressedButtonURL}
 				alt
 			>
 		`; 
 	}
-	private press(): void {
-		this.pressed = true;
+	private humanPress(): void {
+		this.desiredToBePressed = true;
+
+		if (this.state !== "unpressed") {
+			// This will be handled elsewhere
+			return;
+		}
+		this.state = "activating";
+		this.handleStateTransition("unpressed");
 		
-		const audioUrl = PRESS_AUDIO_URLS[Math.floor(Math.random() * PRESS_AUDIO_URLS.length)];
-		const audio = new Audio(audioUrl);
-		audio.volume = .5;
-		audio.play();
 	}
-	private release(): void {
-		this.pressed = false;
+	private humanRelease(): void {
+		this.desiredToBePressed = false;
+		if (this.state !== "pressed") {
+			// This will be handled elsewhere
+			return;
+		}
+		this.state = "deactivating";
+		this.handleStateTransition("pressed");
+	}
+	private async handleStateTransition(from: HotPlateState): Promise<void> {
+		console.log(`transition from ${from} to ${this.state}`);
+		if (this.state === "activating") {
+			const audioUrl = PRESS_AUDIO_URLS[Math.floor(Math.random() * PRESS_AUDIO_URLS.length)];
+			const audio = new Audio(audioUrl);
+			audio.addEventListener("ended", () => {
+				if (this.desiredToBePressed) {
+					this.state = "pressed";
+				} else {
+					this.state = "deactivating";
+				}
+				this.handleStateTransition("activating");
+			}, {once: true});
+			audio.volume = .5;
+			await audio.play();
+			await new Promise(resolve => setTimeout(resolve, IGNITION_OFFSET_MS));
+			const allowedNewState: HotPlateState[] = [
+				"activating",
+				"pressed"
+			];
+			if (allowedNewState.includes(this.state)) {
+				this.fireAudio.play();
+			}
+		}
+		if (this.state === "deactivating") {
+			const audioUrl = RELEASE_AUDIO_URLS[Math.floor(Math.random() * RELEASE_AUDIO_URLS.length)];
+			const audio = new Audio(audioUrl);
+			audio.addEventListener("ended", () => {
+				if (this.desiredToBePressed) {
+					this.state = "activating";
+				} else {
+					this.state = "unpressed";
+				}
+				this.handleStateTransition("deactivating");
+			}, {once: true});
+			audio.volume = .5;
+			audio.play();
+
+			this.fireAudio.pause();
+		}
+
 	}
 	public static styles?: CSSResultGroup = css`
 		:host {
@@ -87,3 +160,5 @@ export class HotPlateElement extends LitElement {
 		}
 	`
 }
+
+type HotPlateState = "unpressed" | "activating" | "pressed" | "deactivating";

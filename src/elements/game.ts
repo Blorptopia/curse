@@ -438,7 +438,7 @@ export class GameElement extends LitElement {
 			--size-multiplier: .14rem;
 		}
 		curse-ingredient-icon {
-			--size-multiplier: 0.08rem;
+			--size-multiplier: 0.04rem;
 		}
 		@media (max-width: 900px) {
 			#window-frame {
