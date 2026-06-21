@@ -9,6 +9,7 @@ import { map } from "lit/directives/map.js";
 import type { Order, OrderTemplate } from "../types/order";
 import { MAX_ORDERS_PER_DAY } from "../config";
 import type { CustomerId } from "../types/customer";
+import { styleMap } from "lit/directives/style-map.js";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -20,6 +21,8 @@ export class GameElement extends LitElement {
 	private orders: Order[];
 	@state()
 	private deadCustomerIds: CustomerId[];
+	@state()
+	private dialogIndex: number;
 
 	public constructor() {
 		super();
@@ -27,6 +30,7 @@ export class GameElement extends LitElement {
 		this.dayIndex = 0;
 		this.deadCustomerIds = [];
 		this.orders = this.createOrders();
+		this.dialogIndex = 0;
 	}
 
 	protected render(): HTMLTemplateResult {
@@ -36,6 +40,7 @@ export class GameElement extends LitElement {
 				<div id="right-window" class="window"></div>
 
 				${map(this.orders, (order, index) => this.renderCustomer(order.customerId, index))}
+				${this.renderDialog()}
 				<div id="hot-plate-container">
 					<curse-hot-plate></curse-hot-plate>
 				</div>
@@ -73,25 +78,67 @@ export class GameElement extends LitElement {
 		`
 
 	}
+	private renderDialog(): HTMLTemplateResult {
+		const activeOrder = this.orders[0];
+
+		if (activeOrder !== undefined) {
+			const dialogPages = activeOrder.description?.length ?? 0;
+			const currentDialogPage = activeOrder.description?.[this.dialogIndex] ?? "";
+			const hasMorePages = dialogPages > this.dialogIndex + 1;
+			return html`
+				<div id="dialog">
+					<div id="dialog-heading">
+						<h1>${activeOrder.name}</h1>
+						<div id="target-color" style=${styleMap({backgroundColor: activeOrder.targetColor})}></div>
+					</div>
+					<p>${currentDialogPage}</p>
+
+					<div id="actions">
+						${hasMorePages ? html`
+							<button	
+								class="primary"
+								type="button"
+								@click=${() => {
+									this.dialogIndex++;
+								}}
+							>Next</button>
+						` : html`
+							<button	
+								class="destructive"
+								type="button"
+								@click=${() => {
+									this.orders = [
+										...this.orders.slice(1)
+									];
+									this.dialogIndex = 0;
+								}}
+							>Reject</button>
+						`}
+					</div>
+				</div>
+			`
+		}
+		return html``
+	}
 	private createOrderTemplates(): OrderTemplate[] {
 		const JACK_INTERACTIONS: OrderTemplate[] = [
 			{
 				name: "Genius potion",
-				description: "My wife keeps winning at trivia and maths, please make me a genius potion.",
+				description: ["My wife keeps winning at trivia and maths, please make me a genius potion."],
 				customerId: "JACK",
 				targetColor: "#00FF00",
 				baseValue: 1
 			},
 			{
 				name: "Stupid potion",
-				description: "I never lose to my wife anymore, but somehow, i learned to speak dog. All my dog does is argue politics with me now. Please make me a stupid potion.",
+				description: ["I never lose to my wife anymore, but somehow, i learned to speak dog. All my dog does is argue politics with me now. Please make me a stupid potion."],
 				customerId: "JACK",
 				targetColor: "#00FFFF",
 				baseValue: 1
 			},
 			{
 				name: "Antidepressant potion",
-				description: "Now that i'm stupid, both my dog and wife keep beating me at everything.\nI still speak dog.\nPlease make me an anti-depression potion.",
+				description: ["Now that i'm stupid, both my dog and wife keep beating me at everything.\nI still speak dog.\nPlease make me an anti-depression potion."],
 				customerId: "JACK",
 				targetColor: "#00FFFF",
 				baseValue: 1
@@ -307,6 +354,32 @@ export class GameElement extends LitElement {
 			}
 			.customer-container[data-index="4"] {
 				display: none;
+			}
+		}
+		#dialog {
+			position: absolute;
+			position-anchor: --active-customer;
+			position-area: top right;
+
+			padding: 1rem;
+			background: white;
+			color: black;
+			border-radius: .75rem;
+
+			#dialog-heading {
+				display: flex;
+				align-content: center;
+				justify-content: space-between;
+			}
+			h1 {
+				margin: 0;
+				vertical-align: middle;
+			}
+			#target-color {
+				--size: 1.75rem;
+				height: var(--size);
+				width: var(--size);
+				border-radius: 50%;
 			}
 		}
 	`;
