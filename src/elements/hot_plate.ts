@@ -1,7 +1,7 @@
 import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import HotPlateURL from "../assets/hot_plate/base.png";
-import HotPlateUnpressedButtonURL from "../assets/cup.png";
+import HotPlateUnpressedButtonURL from "../assets/hot_plate/button/unpressed.png";
 import HotPlatePressedButtonURL from "../assets/hot_plate/button/pressed.png";
 import PressAudio1URL from "../assets/hot_plate/button/press/1.wav";
 import PressAudio2URL from "../assets/hot_plate/button/press/2.wav";
@@ -85,8 +85,5 @@ export class HotPlateElement extends LitElement {
 			left: 0;
 			pointer-events: none;
 		}
-		.button[data-pressed] {
-			background: red;
-		}
-	`;
+	`
 }
