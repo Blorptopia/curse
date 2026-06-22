@@ -17,15 +17,21 @@ export class FlaskElement extends LitElement {
 	public maskSrc: string;
 	@property({type: Boolean})
 	public disabled: boolean;
-	
+
 	// State
 	@state()
 	private angle: number;
-	
+
 	// Attributes
 	private resizeController: ResizeController<DOMRectReadOnly>;
+
+	@state()
 	private contentRect: DOMRectReadOnly;
+
+	@state()
 	private diameter: number;
+
+	@state()
 	private margin: number;
 	private isRotating: boolean;
 
@@ -129,12 +135,17 @@ export class FlaskElement extends LitElement {
 		const bottleX = (this.contentRect.width - (this.diameter / 109 * 74)) / 2;
 		const bottleY = (this.contentRect.height - this.diameter) / 2;
 
+		const angleDegrees = this.angle * Math.PI / 180;
+
 
 		return html`
 			<svg
+				draggable="false"
+
 				@mousedown=${this.onMouseDown}
 				@mouseup=${this.onMouseUp}
 				@mousemove=${this.onMouseMove}
+				@click=${this.blendLayers}
 			>
 				<mask id="bottle-mask">
 					<image x=${bottleX} y=${bottleY} height=${this.diameter} href=${this.maskSrc} class="bottle" transform="rotate(${this.angle})"/>
@@ -147,9 +158,18 @@ export class FlaskElement extends LitElement {
 	}
 
 	static styles: CSSResultGroup = css`
+		:host {
+			width: 100%;
+			height: 100%;
+
+			display: block;
+		}
+
 		svg {
 			width: 100%;
 			height: 100%;
+
+			display: block;
 
 			image-rendering: pixelated;
 		}

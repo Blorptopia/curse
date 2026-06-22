@@ -11,11 +11,16 @@ import type { Order, OrderTemplate } from "../types/order";
 import { MAX_ORDERS_PER_DAY } from "../config";
 import type { CustomerId } from "../types/customer";
 import { styleMap } from "lit/directives/style-map.js";
+<<<<<<< Updated upstream
 import { CUSTOMER_ID_TO_NAME } from "../data/customer";
 import { INGREDIENTS } from "../data/ingredients";
 import type { IngredientId } from "../types/ingredient";
 import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
+=======
+import { Task } from "@lit/task";
+import type { RigidBody, World } from "@dimforge/rapier2d-compat";
+>>>>>>> Stashed changes
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -43,7 +48,7 @@ export class GameElement extends LitElement {
 	}
 
 	protected render(): HTMLTemplateResult {
-	    return html`
+		return html`
 			<section id="window-frame">
 				<div id="left-window" class="window"></div>
 				<div id="right-window" class="window"></div>
@@ -180,7 +185,7 @@ export class GameElement extends LitElement {
 
 					<div id="actions">
 						${hasMorePages ? html`
-							<button	
+							<button
 								class="primary"
 								type="button"
 								@click=${() => {
@@ -188,7 +193,7 @@ export class GameElement extends LitElement {
 								}}
 							>Next</button>
 						` : html`
-							<button	
+							<button
 								class="destructive"
 								type="button"
 								@click=${() => {
@@ -281,7 +286,7 @@ export class GameElement extends LitElement {
 				baseValue: 1
 			},
 		];
-		
+
 		const desiredRandomOrderCount = MAX_ORDERS_PER_DAY - templates.length;
 		for (let i = 0; i < desiredRandomOrderCount; i++) {
 			const template = RANDOM_ORDER_TEMPLATES[Math.floor(Math.random() * RANDOM_ORDER_TEMPLATES.length)]!;
@@ -341,7 +346,7 @@ export class GameElement extends LitElement {
 	public static styles?: CSSResultGroup = css`
 		#window-frame {
 			border: 2rem solid #775079;
-			
+
 			height: 100%;
 			box-sizing: border-box;
 		}
