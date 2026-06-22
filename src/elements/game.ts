@@ -11,16 +11,11 @@ import type { Order, OrderTemplate } from "../types/order";
 import { MAX_ORDERS_PER_DAY } from "../config";
 import type { CustomerId } from "../types/customer";
 import { styleMap } from "lit/directives/style-map.js";
-<<<<<<< Updated upstream
 import { CUSTOMER_ID_TO_NAME } from "../data/customer";
 import { INGREDIENTS } from "../data/ingredients";
 import type { IngredientId } from "../types/ingredient";
 import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
-=======
-import { Task } from "@lit/task";
-import type { RigidBody, World } from "@dimforge/rapier2d-compat";
->>>>>>> Stashed changes
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -52,7 +47,7 @@ export class GameElement extends LitElement {
 			<section id="window-frame">
 				<div id="left-window" class="window"></div>
 				<div id="right-window" class="window"></div>
-				
+
 				${this.orders.length === 0 ? this.renderCustomer(this.dayIndex === 0 ? "LOANS_HARK_PRE_EXPLOSION" : "LOANS_HARK", 0) : null}
 				${map(this.orders, (order, index) => this.renderCustomer(order.customerId, index))}
 				${this.renderDialog()}
