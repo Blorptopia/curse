@@ -5,6 +5,6 @@ export type Rapier = typeof import("@dimforge/rapier2d-compat");
 export type PhysicsContext = {
 	RAPIER?: Rapier,
 	world?: World,
-}
+};
 
-export const physicsContext = createContext<PhysicsContext>("physics")
+export const physicsContext = createContext<PhysicsContext>("physics");
