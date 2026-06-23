@@ -3,8 +3,9 @@ import { provide } from "@lit/context";
 import { Task } from "@lit/task";
 import { css, html, LitElement, type CSSResultGroup, type HTMLTemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
-import { physicsContext, type PhysicsContext } from "../lib/physics_context";
+import { physicsContext, type PhysicsContext, type Rapier } from "../lib/physics_context";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
+
 
 @customElement("curse-physics-world")
 export class PhysicsWorldElement extends LitElement {
@@ -12,7 +13,7 @@ export class PhysicsWorldElement extends LitElement {
 	@provide({ context: physicsContext })
 	public physics: PhysicsContext;
 
-	private rapierTask: Task<[], typeof import("@dimforge/rapier2d-compat")>;
+	private rapierTask: Task<[], Rapier>;
 
 	@state()
 	private world?: World;
@@ -48,7 +49,7 @@ export class PhysicsWorldElement extends LitElement {
 		this.physics = {};
 	}
 
-	private onRapierLoaded(RAPIER: typeof import("@dimforge/rapier2d-compat")): void {
+	private onRapierLoaded(RAPIER: Rapier): void {
 		this.physics.RAPIER = RAPIER;
 
 		this.world = new RAPIER.World({ x: 0.0, y: -9.81 });
