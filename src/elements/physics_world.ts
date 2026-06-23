@@ -1,131 +1,169 @@
-import type { Collider, World } from "@dimforge/rapier2d-compat";
 import { provide } from "@lit/context";
 import { Task } from "@lit/task";
-import { css, html, LitElement, type CSSResultGroup, type HTMLTemplateResult } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { css, html, LitElement, type CSSResultGroup, type HTMLTemplateResult, type PropertyValues } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
 import { physicsContext, type PhysicsContext, type Rapier } from "../lib/physics_context";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
+import { PHYSICS_DEBUG_RES, STAND_HEIGHT_METERS } from "../config";
+import type { Collider, World } from "@dimforge/rapier2d-compat";
 
 
 @customElement("curse-physics-world")
 export class PhysicsWorldElement extends LitElement {
+	// Props
+	@provide({context: physicsContext})
+	@property({type: Object})
+	public physics?: PhysicsContext;
 
-	@provide({ context: physicsContext })
-	public physics: PhysicsContext;
-
-	private rapierTask: Task<[], Rapier>;
-
+	// Attributes
 	private resizeController: ResizeController<DOMRectReadOnly>;
+	private oldSize?: DOMRectReadOnly;
 
-	@state()
-	private world?: World;
-
-	@state()
-	private boundDepth: number;
-
-	@state()
-	private bounds: Collider[];
-
-	private cachedRect?: DOMRectReadOnly;
+	// Elements
+	@query("canvas")
+	private canvasElement?: HTMLCanvasElement;
 
 	public constructor() {
 		super();
 
-		this.rapierTask = new Task(
-			this, {
-			task: async () => {
-				const RAPIER = await import("@dimforge/rapier2d-compat");
-				await RAPIER.init();
-				return RAPIER;
-			},
+		new Task(
+			this,
+			{
+				task: async () => {
+					const RAPIER = await import("@dimforge/rapier2d-compat");
+					await RAPIER.init();
+					return RAPIER;
+				},
 				args: () => [],
 				onComplete: (RAPIER) => {this.onRapierLoaded(RAPIER)}
-		}
+			}
 		);
+		new Task(this, {
+			task: async ([physicsContext, canvasElement], {signal}) => {
+				if (physicsContext === undefined) {
+					return;
+				}
+				let context: CanvasRenderingContext2D | undefined = undefined;
+				if (canvasElement !== undefined) {
+					canvasElement.height = STAND_HEIGHT_METERS * PHYSICS_DEBUG_RES;
+					const pixelDensity = physicsContext.screenSpace.height / STAND_HEIGHT_METERS;
+					canvasElement.width = Math.floor(physicsContext.screenSpace.width / pixelDensity * PHYSICS_DEBUG_RES);
+					context = canvasElement.getContext("2d")!;
+				}
+				while (!signal.aborted) {
+					physicsContext.world.step();
+
+					if (context !== undefined) {
+						context.reset();
+						const { vertices } = physicsContext.world.debugRender();
+						
+						for (let startIndex = 0; startIndex < vertices.length; startIndex += 4) {
+							const points = vertices.slice(startIndex, startIndex + 4);
+
+							const startX = points[0] * PHYSICS_DEBUG_RES;
+							const startY = points[1] * PHYSICS_DEBUG_RES;
+							const stopX = points[2] * PHYSICS_DEBUG_RES;
+							const stopY = points[3] * PHYSICS_DEBUG_RES;
+							context.beginPath();
+							context.moveTo(startX, startY);
+							context.lineTo(stopX, stopY);
+							context.strokeStyle = "#0FF";
+							context.stroke();
+						}
+					}
+					await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+				}
+			},
+			args: () => [this.physics, this.canvasElement]
+		});
 
 		this.resizeController = new ResizeController(
-			this, {
-			callback: (entries) => {
-					if (entries.length > 0) {
-						this.cachedRect = entries[0].contentRect;
-					return entries[0].contentRect;
+				this,
+				{
+					callback: (entries) => {
+						if (entries.length > 0) {
+							return entries[0].contentRect;
+						}
+						return new DOMRectReadOnly();
+					},
+					target: document.documentElement
 				}
-				return new DOMRectReadOnly();
-				},
-		}
 		);
-
-		this.physics = {};
-		this.boundDepth = 30;
-		this.bounds = [];
 	}
+	private onRapierLoaded(rapier: Rapier): void {
+		const world = new rapier.World({x: 0.0, y: 9.81});
 
-	private onRapierLoaded(RAPIER: Rapier): void {
-		this.physics.RAPIER = RAPIER;
+		const screenSpace = {
+			height: this.resizeController.value!.height,
+			width: this.resizeController.value!.width,
+		};
+		const pixelDensity = screenSpace.height / STAND_HEIGHT_METERS;
+		const worldWidth = screenSpace.width / pixelDensity;
+		
+		this.physics = {
+			rapier,
+			world,
+			screenSpace,
+			boundingColliders: this.createBoundColliders(world, rapier, worldWidth)
+		};
+		console.log("Initialized rapier", {screenSpace, worldWidth, pixelDensity});
 
-		this.world = new RAPIER.World({ x: 0.0, y: -9.81 });
-		this.physics.world;
-
-		this.physicsLoop(RAPIER);
+		const rigidBody = this.physics.world.createRigidBody(this.physics.rapier.RigidBodyDesc.dynamic());
+		this.physics.world.createCollider(this.physics.rapier.ColliderDesc.ball(.5), rigidBody);
+		rigidBody.setTranslation({x: worldWidth / 2, y: STAND_HEIGHT_METERS / 2}, true);
 	}
+	private createBoundColliders(world: World, rapier: Rapier, worldWidth: number): Collider[] {
+		const colliderWidth = 1;
+		const topCollider = world.createCollider(rapier.ColliderDesc.cuboid(worldWidth, colliderWidth));
+		topCollider.setTranslation({x: 0, y: -colliderWidth})
+		const bottomCollider = world.createCollider(rapier.ColliderDesc.cuboid(worldWidth, colliderWidth));
+		bottomCollider.setTranslation({x: 0, y: STAND_HEIGHT_METERS + colliderWidth});
 
-	private physicsLoop(RAPIER: typeof import("@dimforge/rapier2d-compat")): void {
-		if (this.cachedRect !== undefined && this.resizeController.value !== undefined) {
-			if (this.cachedRect.width !== this.resizeController.value.width && this.cachedRect.height !== this.resizeController.value.height) {
-				this.updateBounds(RAPIER)
-			}
-		}
-
-		if (this.world !== undefined) {
-			this.world.step();
-		}
-
-		requestAnimationFrame(() => {
-			this.physicsLoop(RAPIER);
-		})
-	}
-
-	private updateBounds(RAPIER: typeof import("@dimforge/rapier2d-compat")): void {
-		if (this.resizeController.value === undefined) {
-			return;
-		}
-		if (this.world === undefined) {
-			return;
-		}
-
-		for (const bound of this.bounds) {
-			this.world.removeCollider(bound, false);
-		}
-
-		const horisontalCollider = RAPIER.ColliderDesc.cuboid(this.resizeController.value.width, this.boundDepth);
-		const verticalCollider = RAPIER.ColliderDesc.cuboid(this.boundDepth, this.resizeController.value.height);
-
-		const topCollider = this.world.createCollider(horisontalCollider);
-		topCollider.setTranslation({ x: 0, y: -this.boundDepth });
-
-		const rightCollider = this.world.createCollider(verticalCollider);
-		rightCollider.setTranslation({ x: this.resizeController.value.right, y: 0 });
-
-		const bottomCollider = this.world.createCollider(horisontalCollider);
-		bottomCollider.setTranslation({ x: 0, y: this.resizeController.value.bottom });
-
-		const leftCollider = this.world.createCollider(verticalCollider);
-		leftCollider.setTranslation({ x: -this.boundDepth, y: 0 });
-
-		this.bounds = [
+		const leftCollider = world.createCollider(rapier.ColliderDesc.cuboid(colliderWidth, STAND_HEIGHT_METERS));
+		leftCollider.setTranslation({x: -colliderWidth, y: 0})
+		const rightCollider = world.createCollider(rapier.ColliderDesc.cuboid(colliderWidth, STAND_HEIGHT_METERS));
+		rightCollider.setTranslation({x: worldWidth + colliderWidth, y: 0})
+		
+		return [
 			topCollider,
-			rightCollider,
 			bottomCollider,
-			leftCollider
+			leftCollider,
+			rightCollider
 		];
+	}
 
+	protected willUpdate(changedProperties: PropertyValues): void {
+		console.log("willUpdate");
+	    super.willUpdate(changedProperties);
+		if (this.physics === undefined) {
+			return;
+		}
+		const currentSize = this.resizeController.value!;
+		const sizeUpdated = this.oldSize === undefined || currentSize.height !== this.oldSize.height || currentSize.width !== this.oldSize.width;
+		if (sizeUpdated) {
+			const screenSpace = {
+				height: this.resizeController.value!.height,
+				width: this.resizeController.value!.width,
+			};
+			for (const oldCollider of this.physics.boundingColliders) {
+				this.physics.world.removeCollider(oldCollider, false);
+			}
+			const pixelDensity = screenSpace.height / STAND_HEIGHT_METERS;
+			const worldWidth = screenSpace.width / pixelDensity;
+			this.physics = {
+				...this.physics,
+				screenSpace,
+				boundingColliders: this.createBoundColliders(this.physics.world, this.physics.rapier, worldWidth)
+			};
+			console.log("updated after size change", {screenSpace, pixelDensity, worldWidth});
+			this.oldSize = currentSize;
+		}
 	}
 
 	protected render(): HTMLTemplateResult {
 		return html`
-			${this.rapierTask.render({
-				complete: () => html`<slot></slot>`
-			})}
+			<canvas></canvas>
+			<slot></slot>
 		`;
 	}
 
@@ -135,6 +173,16 @@ export class PhysicsWorldElement extends LitElement {
 			height: 100%;
 
 			display: block;
+		}
+		canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+
+			z-index: 5000;
+			pointer-events: none;
 		}
 	`;
 

@@ -22,6 +22,7 @@ const RANDOM_VALUE_VARIATION: number = 0.1;
 
 @customElement("curse-game")
 export class GameElement extends LitElement {
+	// State
 	@state()
 	private dayIndex: number;
 	@state()
@@ -32,6 +33,7 @@ export class GameElement extends LitElement {
 	private dialogIndex: number;
 	@state()
 	private productPurchaseCount: Partial<Record<ItemId | IngredientId, number>>;
+
 
 	public constructor() {
 		super();
