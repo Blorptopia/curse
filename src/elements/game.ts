@@ -22,6 +22,7 @@ import { physicsContext, type PhysicsContext } from "../lib/physics_context";
 import { ColliderDesc, type Collider, type RigidBody } from "@dimforge/rapier2d-compat";
 import type { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
+import type { BoundingBox } from "../types/physics";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -388,17 +389,31 @@ export class GameElement extends LitElement {
 		].filter(element => element !== undefined);
 		
 		for (const colldierElement of constantColliderElements) {
-			let rect = colldierElement.getBoundingClientRect();
-			const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
-			const height = rect.height / pixelDensity;
-			const width = rect.width / pixelDensity;
-			const collider = this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(width / 2, height / 2));
-			const x = rect.x / pixelDensity + width / 2;
-			const y = rect.y / pixelDensity + height / 2;
-			collider.setTranslation({x, y});
+			const box = this.createGameBoundsForElement(colldierElement, this.physics);
+			const collider = this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(box.hw, box.hh));
+			collider.setTranslation({x: box.x, y: box.y});
 			this.constantColliders.push(collider);
-
 		}
+	}
+	private createGameBoundsForElement(element: HTMLElement, physics: PhysicsContext): BoundingBox {
+		window.scrollX
+		let rect = element.getBoundingClientRect();
+		const pixelDensity = physics.screenSpace.height / STAND_HEIGHT_METERS;
+
+		const hh = rect.height / pixelDensity / 2;
+		const hw = rect.width / pixelDensity / 2;
+		const xRelativeToRoot = rect.x + window.scrollX;
+		const yRelativeToRoot = rect.y + window.scrollY;
+		const x = xRelativeToRoot / pixelDensity + hw;
+		const y = yRelativeToRoot / pixelDensity + hh;
+
+		return {
+			x,
+			y,
+			hw,
+			hh
+		}
+		
 	}
 	public static styles?: CSSResultGroup = css`
 		#window-frame {
