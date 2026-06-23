@@ -4,7 +4,7 @@ import { css, html, LitElement, type CSSResultGroup, type HTMLTemplateResult, ty
 import { customElement, property, query } from "lit/decorators.js";
 import { physicsContext, type PhysicsContext, type Rapier } from "../lib/physics_context";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
-import { PHYSICS_DEBUG_RES, STAND_HEIGHT_METERS } from "../config";
+import { PHYSICS_DEBUG, PHYSICS_DEBUG_RES, STAND_HEIGHT_METERS } from "../config";
 import type { Collider, World } from "@dimforge/rapier2d-compat";
 
 
@@ -53,7 +53,7 @@ export class PhysicsWorldElement extends LitElement {
 				while (!signal.aborted) {
 					physicsContext.world.step();
 
-					if (context !== undefined) {
+					if (context !== undefined && PHYSICS_DEBUG) {
 						context.reset();
 						const { vertices } = physicsContext.world.debugRender();
 						

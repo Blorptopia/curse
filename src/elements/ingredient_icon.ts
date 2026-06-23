@@ -21,7 +21,15 @@ export class IngredientIconElement extends LitElement {
 	protected render(): HTMLTemplateResult {
 		const imageUrl = INGREDIENT_TO_IMAGES[this.ingredientId];
 	   	return html`
-			<img src=${imageUrl} alt="">
+			<img
+				src=${imageUrl}
+				?draggable=${this.draggable}
+				alt=""
+				@dragstart=${(event: DragEvent) => {
+					event.dataTransfer!.setData("curse/ingredient", this.ingredientId);
+					console.log(event.dataTransfer!.types);
+				}}
+			>
 		`;
 	}
 

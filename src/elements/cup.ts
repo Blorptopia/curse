@@ -1,13 +1,14 @@
 import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css } from "lit";
 import { customElement } from "lit/decorators.js";
-import HotPlateURL from "../assets/cup.png";
+import CupURL from "../assets/cup.png";
 
 @customElement("curse-cup")
 export class CupElement extends LitElement {
 	protected render(): HTMLTemplateResult {
 	   	return html`
 			<img
-				src=${HotPlateURL}
+				src=${CupURL}
+				draggable="false"
 				alt
 			>
 		`; 

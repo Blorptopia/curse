@@ -23,6 +23,8 @@ import { ColliderDesc, type Collider, type RigidBody } from "@dimforge/rapier2d-
 import type { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import type { BoundingBox } from "../types/physics";
+import type { GameEntity } from "../types/entity";
+import { Task } from "@lit/task";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -46,10 +48,13 @@ export class GameElement extends LitElement {
 	// Attributes
 	private constantColliders: Collider[];
 	private resizeController: ResizeController;
+	private entities: GameEntity[];
 
 	// Elements
 	@query("curse-hot-plate")
 	private hotPlateElement?: HotPlateElement;
+	@query("#entities-container")
+	private entitiesContainerElement?: HTMLDivElement;
 
 
 	public constructor() {
@@ -62,6 +67,7 @@ export class GameElement extends LitElement {
 		this.productPurchaseCount = {};
 		
 		this.constantColliders = [];
+		this.entities = [];
 		this.resizeController = new ResizeController(this, {
 			callback: (entries) => {
 				if (entries.length > 0) {
@@ -71,21 +77,95 @@ export class GameElement extends LitElement {
 			}
 		});
 
+		new Task(this, {
+			task: async ([physics], {signal}) => {
+				if (physics === undefined) {
+					return;
+				}
+				const pixelDensity = physics.screenSpace.height / STAND_HEIGHT_METERS;
+				while (!signal.aborted) {
+					await new Promise<void>(resolve => {requestAnimationFrame(() => resolve())});
+
+					for (const entity of this.entities) {
+						const translation = entity.rigidBody.translation();
+						const rotation = entity.rigidBody.rotation();
+						const x = (translation.x - entity.size.width) * pixelDensity;
+						const y = (translation.y - entity.size.height) * pixelDensity;
+						entity.element.style.left = `${x}px`;
+						entity.element.style.top = `${y}px`;
+						entity.element.style.transform = `${rotation}deg`;
+					}
+				}
+			},
+			args: () => [this.physics] as const
+		});
+
 	}
 
 	protected render(): HTMLTemplateResult {
 		return html`
-			<curse-physics-world>
+			<div
+				id="window-frame"
+				@dragover=${(event: DragEvent) => {
+					const itemId = event.dataTransfer!.getData("curse/item");
+					const ingredientId = event.dataTransfer!.getData("curse/ingredient");
+					
+					const isValid = itemId !== "" || ingredientId !== "";
+					if (isValid) {
+						event.preventDefault();
+					}
+				}}
+				@drop=${(event: DragEvent) => {
+					event.preventDefault();
+					const itemId = event.dataTransfer!.getData("curse/item");
+					const ingredientId = event.dataTransfer!.getData("curse/ingredient");
+
+					if (this.physics === undefined) {
+						throw new Error("cannot handle drop - missing physics");
+					}
+					if (this.entitiesContainerElement === undefined) {
+						throw new Error("entitiesContainerElement is not defined");
+					}
+
+					if (itemId !== "") {
+						alert("item");
+					}
+					if (ingredientId !== "") {
+						const sizePixels = .1;
+						const sizeWorld = 0.035;
+						const rigidBody = this.physics.world.createRigidBody(this.physics.rapier.RigidBodyDesc.dynamic());
+						this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(sizeWorld, sizeWorld), rigidBody);
+
+						const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
+						const x = event.offsetX / pixelDensity;
+						const y = event.offsetY / pixelDensity;
+						
+						rigidBody.setTranslation({x, y}, true);
+
+						const visualElement = document.createElement("curse-ingredient-icon");
+						visualElement.setAttribute("ingredientid", ingredientId);
+						visualElement.classList.add("entity", "ingredient");
+						this.entitiesContainerElement.appendChild(visualElement);
+						this.entities.push({
+							rigidBody,
+							size: {height: sizeWorld, width: sizeWorld},
+							element: visualElement
+						});
+					}
+					
+				}}
+			>
 				<div id="left-window" class="window"></div>
 				<div id="right-window" class="window"></div>
 
 				${this.orders.length === 0 ? this.renderCustomer(this.dayIndex === 0 ? "LOANS_HARK_PRE_EXPLOSION" : "LOANS_HARK", 0) : null}
 				${map(this.orders, (order, index) => this.renderCustomer(order.customerId, index))}
 				${this.renderDialog()}
+				<div id="entities-container"></div>
 				<div id="hot-plate-container">
 					<curse-hot-plate></curse-hot-plate>
 				</div>
-			</curse-physics-world>
+			</div>
 			<section id="shelf">
 				<div id="items-row" class="shelf-row">
 					${map(Object.keys(ITEMS) as ItemId[], itemId => this.renderItemListing(itemId))}
@@ -133,7 +213,12 @@ export class GameElement extends LitElement {
 						${factFragments}
 					</dl>
 				</div>
-				<curse-ingredient-icon ingredientid=${ingredientId}></curse-ingredient-icon>
+				<curse-ingredient-icon
+					@dragstart=${(event: DragEvent) => {
+						event.dataTransfer!.setData("curse/ingredient", ingredientId);
+					}}
+					.ingredientId=${ingredientId}
+				></curse-ingredient-icon>
 			</div>
 		`
 
@@ -396,7 +481,6 @@ export class GameElement extends LitElement {
 		}
 	}
 	private createGameBoundsForElement(element: HTMLElement, physics: PhysicsContext): BoundingBox {
-		window.scrollX
 		let rect = element.getBoundingClientRect();
 		const pixelDensity = physics.screenSpace.height / STAND_HEIGHT_METERS;
 
@@ -591,6 +675,10 @@ export class GameElement extends LitElement {
 		}
 		dt {
 			font-weight: bold;
+		}
+
+		.entity {
+			position: absolute;
 		}
 	`;
 }
