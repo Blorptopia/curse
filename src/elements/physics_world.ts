@@ -108,9 +108,6 @@ export class PhysicsWorldElement extends LitElement {
 		};
 		console.log("Initialized rapier", {screenSpace, worldWidth, pixelDensity});
 
-		const rigidBody = this.physics.world.createRigidBody(this.physics.rapier.RigidBodyDesc.dynamic());
-		this.physics.world.createCollider(this.physics.rapier.ColliderDesc.ball(.5), rigidBody);
-		rigidBody.setTranslation({x: worldWidth / 2, y: STAND_HEIGHT_METERS / 2}, true);
 	}
 	private createBoundColliders(world: World, rapier: Rapier, worldWidth: number): Collider[] {
 		const colliderWidth = 1;

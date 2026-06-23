@@ -1,5 +1,5 @@
-import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css, type PropertyValues } from "lit";
+import { customElement, query, state } from "lit/decorators.js";
 import "./customer_portrait";
 import "./hot_plate";
 import "./cup";
@@ -9,7 +9,7 @@ import "./flask";
 import "./physics_world";
 import { map } from "lit/directives/map.js";
 import type { Order, OrderTemplate } from "../types/order";
-import { MAX_ORDERS_PER_DAY } from "../config";
+import { MAX_ORDERS_PER_DAY, STAND_HEIGHT_METERS } from "../config";
 import type { CustomerId } from "../types/customer";
 import { styleMap } from "lit/directives/style-map.js";
 import { CUSTOMER_ID_TO_NAME } from "../data/customer";
@@ -17,11 +17,19 @@ import { INGREDIENTS } from "../data/ingredients";
 import type { IngredientId } from "../types/ingredient";
 import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
+import { consume } from "@lit/context";
+import { physicsContext, type PhysicsContext } from "../lib/physics_context";
+import { ColliderDesc, type Collider, type RigidBody } from "@dimforge/rapier2d-compat";
+import type { HotPlateElement } from "./hot_plate";
+import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
 @customElement("curse-game")
 export class GameElement extends LitElement {
+	// Props
+	@consume({context: physicsContext, subscribe: true})
+	public physics?: PhysicsContext;
 	// State
 	@state()
 	private dayIndex: number;
@@ -34,6 +42,14 @@ export class GameElement extends LitElement {
 	@state()
 	private productPurchaseCount: Partial<Record<ItemId | IngredientId, number>>;
 
+	// Attributes
+	private constantColliders: Collider[];
+	private resizeController: ResizeController;
+
+	// Elements
+	@query("curse-hot-plate")
+	private hotPlateElement?: HotPlateElement;
+
 
 	public constructor() {
 		super();
@@ -43,6 +59,17 @@ export class GameElement extends LitElement {
 		this.orders = this.createOrders();
 		this.dialogIndex = 0;
 		this.productPurchaseCount = {};
+		
+		this.constantColliders = [];
+		this.resizeController = new ResizeController(this, {
+			callback: (entries) => {
+				if (entries.length > 0) {
+					return entries[0].contentRect;
+				}
+				return new DOMRectReadOnly();
+			}
+		});
+
 	}
 
 	protected render(): HTMLTemplateResult {
@@ -340,6 +367,38 @@ export class GameElement extends LitElement {
 			return 350;
 		}
 		return 550;
+	}
+	protected willUpdate(changedProperties: PropertyValues): void {
+	    super.willUpdate(changedProperties);
+
+		if (this.physics === undefined) {
+			return;
+		}
+		if (this.hotPlateElement === undefined) {
+			return;
+		}
+
+		for (const constantCollider of this.constantColliders) {
+			this.physics.world.removeCollider(constantCollider, true);
+		}
+		this.constantColliders = [];
+
+		const constantColliderElements: HTMLElement[] = [
+			this.hotPlateElement
+		].filter(element => element !== undefined);
+		
+		for (const colldierElement of constantColliderElements) {
+			let rect = colldierElement.getBoundingClientRect();
+			const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
+			const height = rect.height / pixelDensity;
+			const width = rect.width / pixelDensity;
+			const collider = this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(width / 2, height / 2));
+			const x = rect.x / pixelDensity + width / 2;
+			const y = rect.y / pixelDensity + height / 2;
+			collider.setTranslation({x, y});
+			this.constantColliders.push(collider);
+
+		}
 	}
 	public static styles?: CSSResultGroup = css`
 		#window-frame {
