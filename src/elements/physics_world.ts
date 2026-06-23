@@ -1,14 +1,23 @@
 import type { World } from "@dimforge/rapier2d-compat";
+import { provide } from "@lit/context";
 import { Task } from "@lit/task";
-import { html, LitElement, type HTMLTemplateResult } from "lit";
-import { customElement } from "lit/decorators.js";
+import { css, html, LitElement, type CSSResultGroup, type HTMLTemplateResult } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { physicsContext, type PhysicsContext } from "../lib/physics_context";
+import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 
 @customElement("curse-physics-world")
 export class PhysicsWorldElement extends LitElement {
 
+	@provide({ context: physicsContext })
+	public physics: PhysicsContext;
+
 	private rapierTask: Task<[], typeof import("@dimforge/rapier2d-compat")>;
 
+	@state()
 	private world?: World;
+
+	private resizeController: ResizeController<DOMRectReadOnly>;
 
 	public constructor() {
 		super();
@@ -24,13 +33,33 @@ export class PhysicsWorldElement extends LitElement {
 				onComplete: (RAPIER) => {this.onRapierLoaded(RAPIER)}
 		}
 		);
+
+		this.resizeController = new ResizeController(
+			this, {
+			callback: (entries) => {
+				if (entries.length > 0) {
+					return entries[0].contentRect;
+				}
+				return new DOMRectReadOnly();
+			}
+		}
+		);
+
+		this.physics = {};
 	}
 
 	private onRapierLoaded(RAPIER: typeof import("@dimforge/rapier2d-compat")): void {
+		this.physics.RAPIER = RAPIER;
+
 		this.world = new RAPIER.World({ x: 0.0, y: -9.81 });
+		this.physics.world;
 	}
 
-	private physicsLoop() {
+	private updateBounds(): void {
+
+	}
+
+	private physicsLoop(): void {
 		if (this.world !== undefined) {
 			this.world.step();
 		}
@@ -47,5 +76,14 @@ export class PhysicsWorldElement extends LitElement {
 			})}
 		`;
 	}
+
+	static styles: CSSResultGroup = css`
+		:host {
+			width: 100%;
+			height: 100%;
+
+			display: block;
+		}
+	`;
 
 }

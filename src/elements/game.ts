@@ -6,6 +6,7 @@ import "./cup";
 import "./ingredient_icon";
 import "./customer_shadow";
 import "./flask";
+import "./physics_world";
 import { map } from "lit/directives/map.js";
 import type { Order, OrderTemplate } from "../types/order";
 import { MAX_ORDERS_PER_DAY } from "../config";
@@ -44,7 +45,7 @@ export class GameElement extends LitElement {
 
 	protected render(): HTMLTemplateResult {
 		return html`
-			<section id="window-frame">
+			<curse-physics-world>
 				<div id="left-window" class="window"></div>
 				<div id="right-window" class="window"></div>
 
@@ -54,7 +55,7 @@ export class GameElement extends LitElement {
 				<div id="hot-plate-container">
 					<curse-hot-plate></curse-hot-plate>
 				</div>
-			</section>
+			</curse-physics-world>
 			<section id="shelf">
 				<div id="items-row" class="shelf-row">
 					${map(Object.keys(ITEMS) as ItemId[], itemId => this.renderItemListing(itemId))}
