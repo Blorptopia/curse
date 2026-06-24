@@ -791,11 +791,11 @@ export class GameElement extends LitElement {
 			pointer-events: none;
 
 			curse-customer-portrait {
-				--size-multiplier: .35rem;
+				--size-multiplier: .25rem;
 				anchor-name: --active-customer;
 			}
 			curse-customer-shadow {
-				--size-multiplier: .25rem;
+				--size-multiplier: .20rem;
 			}
 		}
 		.customer-container[data-index="0"] {
@@ -831,7 +831,7 @@ export class GameElement extends LitElement {
 			justify-content: center;
 
 			curse-hot-plate {
-				--size-multiplier: .17rem;
+				--size-multiplier: .11rem;
 			}
 		}
 		curse-cup {
@@ -840,7 +840,7 @@ export class GameElement extends LitElement {
 		curse-ingredient-icon {
 			--size-multiplier: 0.04rem;
 		}
-		@media (max-width: 900px) {
+		@media (max-width: 800px) {
 			#window-frame {
 				border-top: none;
 				border-left: none;
@@ -861,7 +861,7 @@ export class GameElement extends LitElement {
 				display: none;
 			}
 		}
-		@media (max-width: 1900px) {
+		@media (max-width: 1600px) {
 			.customer-container[data-index="3"] {
 				display: none;
 			}
@@ -928,7 +928,7 @@ export class GameElement extends LitElement {
 			position: absolute;
 		}
 		curse-conical-flask {
-			--size-multiplier: 0.2rem;
+			--size-multiplier: 0.1rem;
 		}
 	`;
 }
