@@ -1,8 +1,10 @@
-import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css, type PropertyValues } from "lit";
+import { customElement, property, query, state } from "lit/decorators.js";
 import FlaskImageURL from "../../assets/flask/conical/image.png";
 import type { PlaceItemData } from "../../types/place";
 import { Task } from "@lit/task";
+import type { IngredientId } from "../../types/ingredient";
+import type { IngredientInstance } from "../../types/flask";
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {
@@ -20,6 +22,10 @@ export class ConicalFlaskBaseElement extends LitElement {
 	@query("canvas")
 	private canvasElement?: HTMLCanvasElement;
 
+	// State
+	@state()
+	private instances: Partial<Record<string, IngredientInstance>>;
+
 	// Attributes
 	private renderTask: Task<[HTMLCanvasElement?], void>;
 
@@ -28,6 +34,8 @@ export class ConicalFlaskBaseElement extends LitElement {
 		this.angleRad = 0;
 		this.shouldBeDraggable = true;
 		this.disabled = false;
+
+		this.instances = {};
 
 		this.renderTask = new Task(this, {
 			task: async ([canvas, disabled], {signal}) => {
@@ -45,7 +53,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 				}
 			},
 			args: () => [this.canvasElement, this.disabled] as const
-		})
+		});
 	}
 	protected render(): HTMLTemplateResult {
 	   	return html`
@@ -101,4 +109,52 @@ export class ConicalFlaskBaseElement extends LitElement {
 			pointer-events: none;
 		}
 	`;
+
+	public addIngredient(ingredientId: IngredientId): void {
+		const instance = {
+				ingredientId,
+				mixedFraction: 0,
+				poisonFraction: 0,
+				spinsFromStart: 0,
+				totalRotation: 0
+		} satisfies IngredientInstance;
+		const instanceId = crypto.randomUUID();
+		this.instances = {
+			...this.instances,
+			[instanceId]: instance
+		};
+	}
+	protected willUpdate(changedProperties: PropertyValues): void {
+	    super.willUpdate(changedProperties);
+
+		const oldAngleRad = changedProperties.get("angleRad") as number | undefined;
+		console.log({oldAngleRad, angleRad: this.angleRad});
+		
+		// This is broken. @platinumaniac pls fix kthx
+		// if (oldAngleRad !== undefined) {
+		// 	if (oldAngleRad > 0 && this.angleRad < 0) {
+		// 		console.log("mutating - spun left");
+		// 		this.mutateInstances(instance => {
+		// 			return {
+		// 				...instance,
+		// 				spinsFromStart: instance.spinsFromStart - 1
+		// 			}
+		// 		})
+		// 	}
+		// 	if (oldAngleRad < 0 && this.angleRad > 0) {
+		// 		console.log("mutating - spun right");
+		// 		this.mutateInstances(instance => {
+		// 			return {
+		// 				...instance,
+		// 				spinsFromStart: instance.spinsFromStart + 1
+		// 			}
+		// 		})
+		// 	}
+		// }
+	}
+	private mutateInstances(mutator: (instance: IngredientInstance) => IngredientInstance): void {
+		for (const [instanceId, instance] of Object.entries(this.instances)) {
+			this.instances[instanceId] = mutator(instance!);
+		}
+	}
 }

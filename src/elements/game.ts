@@ -101,6 +101,7 @@ export class GameElement extends LitElement {
 						entity.element.style.left = `${x}px`;
 						entity.element.style.top = `${y}px`;
 						entity.element.style.transform = `rotate(${rotation}rad)`;
+						entity.element.setAttribute("anglerad", rotation.toString());
 					}
 				}
 			},

@@ -1,6 +1,9 @@
-import type { ColorInstance } from "color";
+import type { IngredientId } from "./ingredient";
 
-export type LiquidLayer = {
-	color: ColorInstance;
-	height: number;
-}
+export type IngredientInstance = {
+	ingredientId: IngredientId;
+	mixedFraction: number;
+	poisonFraction: number;
+	totalRotation: number;
+	spinsFromStart: number;
+};
