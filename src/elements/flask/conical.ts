@@ -54,6 +54,9 @@ export class ConicalFlaskBaseElement extends LitElement {
 				.draggable=${this.shouldBeDraggable}
 				alt=""
 				@dragstart=${(event: DragEvent) => {
+					if (!this.shouldBeDraggable) {
+						return;
+					}
 					const imageElement = this.imageElement!;
 					const rect = imageElement.getBoundingClientRect();
 					const payload: PlaceItemData = {

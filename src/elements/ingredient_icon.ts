@@ -53,6 +53,8 @@ export class IngredientIconElement extends LitElement {
 			--source-width: 100;
 			height: calc(var(--source-height) * var(--size-multiplier));
 			width: calc(var(--source-width) * var(--size-multiplier));
+
+			user-select: none;
 		}
 		img {
 			display: block;

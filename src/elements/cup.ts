@@ -23,6 +23,9 @@ export class CupElement extends LitElement {
 				.draggable=${this.shouldBeDraggable}
 				alt=""
 				@dragstart=${(event: DragEvent) => {
+					if (!this.shouldBeDraggable) {
+						return;
+					}
 					const imageElement = this.imageElement!;
 					const rect = imageElement.getBoundingClientRect();
 					const payload: PlaceItemData = {
@@ -44,6 +47,8 @@ export class CupElement extends LitElement {
 			--source-width: 28;
 			height: calc(var(--source-height) * var(--size-multiplier));
 			width: calc(var(--source-width) * var(--size-multiplier));
+
+			user-select: none;
 		}
 		img {
 			display: block;

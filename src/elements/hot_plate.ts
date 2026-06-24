@@ -138,6 +138,8 @@ export class HotPlateElement extends LitElement {
 			width: calc(var(--source-width) * var(--size-multiplier));
 
 			position: relative;
+
+			user-select: none;
 		}
 		.base {
 			cursor: pointer;
