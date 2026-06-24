@@ -152,6 +152,7 @@ export class GameElement extends LitElement {
 								hw: halfHeightWorld
 							}
 						} satisfies PhysicsUserData;
+						rigidBody.setAdditionalMassProperties(rigidBody.mass(), {x: 0, y: -halfHeightWorld / 1.5}, 0, true)
 						
 						let visualElement: HTMLElement | undefined = undefined;
 						if (item.itemId === "CONICAL_FLASK") {
@@ -192,6 +193,7 @@ export class GameElement extends LitElement {
 								hw: halfSizeWorld
 							}
 						} satisfies PhysicsUserData;
+						rigidBody.setAdditionalMassProperties(rigidBody.mass(), {x: 0, y: -halfSizeWorld / 1.5}, 0, true)
 
 						const visualElement = document.createElement("curse-ingredient-icon");
 						visualElement.setAttribute("ingredientid", ingredient.ingredientId);
