@@ -107,10 +107,10 @@ export class GameElement extends LitElement {
 			<div
 				id="window-frame"
 				@dragover=${(event: DragEvent) => {
-					const itemId = event.dataTransfer!.getData("curse/item");
-					const ingredientId = event.dataTransfer!.getData("curse/ingredient");
+					console.log(event.dataTransfer!.types);
+					const types = event.dataTransfer!.types;
 					
-					const isValid = itemId !== "" || ingredientId !== "";
+					const isValid = types.includes("curse/item") || types.includes("curse/ingredient");
 					if (isValid) {
 						event.preventDefault();
 					}
