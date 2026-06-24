@@ -1,0 +1,30 @@
+:root {
+	background: url("/src/assets/game_over.png");
+	background-size: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
+	image-rendering: pixelated;
+}
+
+#menu {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 1rem;
+	height: 100%;
+	width: max-content;
+}
+.link-button {
+	text-decoration: none;
+	color: inherit;
+	padding: 1rem;
+	border-radius: .25rem;
+
+	font-size: 2rem;
+}
+.primary {
+	background: #875f90;
+}
+.primary:hover {
+	background: #773a7c;
+}
