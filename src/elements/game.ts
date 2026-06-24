@@ -93,7 +93,8 @@ export class GameElement extends LitElement {
 						const y = (translation.y - entity.size.height) * pixelDensity;
 						entity.element.style.left = `${x}px`;
 						entity.element.style.top = `${y}px`;
-						entity.element.style.transform = `${rotation}deg`;
+						console.log({rotation});
+						entity.element.style.transform = `rotate(${rotation}rad)`;
 					}
 				}
 			},
