@@ -5,6 +5,7 @@ import type { PlaceItemData } from "../../types/place";
 import { Task } from "@lit/task";
 import type { IngredientId } from "../../types/ingredient";
 import type { IngredientInstance } from "../../types/flask";
+import MaskImageURL from "../../assets/flask/conical/mask.png?url";
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {
@@ -27,7 +28,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 	private instances: Partial<Record<string, IngredientInstance>>;
 
 	// Attributes
-	private renderTask: Task<[HTMLCanvasElement?], void>;
+	private renderTask: Task<[HTMLCanvasElement | undefined, boolean], void>;
 
 	private liquidResolution: number;
 	private wavelength: number;
@@ -56,7 +57,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 					let wave: number[] = [];
 
 					const maskImage = new Image();
-					maskImage.src = "./src/assets/flask/conical/mask.png";
+					maskImage.src = MaskImageURL;
 					context.imageSmoothingEnabled = false;
 					context.save()
 					context.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
