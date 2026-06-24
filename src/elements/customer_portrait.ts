@@ -3,10 +3,11 @@ import { customElement, property } from "lit/decorators.js";
 import type { CustomerId } from "../types/customer";
 
 import JackURL from "../assets/customers/jack/portrait.png";
+import JoanyURL from "../assets/customers/joany/portrait.png";
 
 const ID_TO_IMAGES = {
-	GUSTAVO: "",
-	JACK: JackURL
+	JACK: JackURL,
+	JOANY: JoanyURL
 } satisfies Record<CustomerId, string>;
 
 @customElement("curse-customer-portrait")

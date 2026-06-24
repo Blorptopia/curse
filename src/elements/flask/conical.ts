@@ -128,7 +128,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 	    super.willUpdate(changedProperties);
 
 		const oldAngleRad = changedProperties.get("angleRad") as number | undefined;
-		console.log({oldAngleRad, angleRad: this.angleRad});
+		// console.log({oldAngleRad, angleRad: this.angleRad});
 		
 		// This is broken. @platinumaniac pls fix kthx
 		// if (oldAngleRad !== undefined) {

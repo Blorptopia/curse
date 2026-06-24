@@ -6,6 +6,8 @@ import { physicsContext, type PhysicsContext, type Rapier } from "../lib/physics
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import { PHYSICS_DEBUG, PHYSICS_DEBUG_RES, STAND_HEIGHT_METERS } from "../config";
 import type { Collider, World } from "@dimforge/rapier2d-compat";
+import type { GameElement } from "./game";
+import "./game";
 
 
 @customElement("curse-physics-world")
@@ -22,6 +24,8 @@ export class PhysicsWorldElement extends LitElement {
 	// Elements
 	@query("canvas")
 	private canvasElement?: HTMLCanvasElement;
+	@query("curse-game")
+	private gameElement?: GameElement;
 
 	public constructor() {
 		super();
@@ -50,8 +54,21 @@ export class PhysicsWorldElement extends LitElement {
 					canvasElement.width = Math.floor(physicsContext.screenSpace.width / pixelDensity * PHYSICS_DEBUG_RES);
 					context = canvasElement.getContext("2d")!;
 				}
+				const eventQueue = new physicsContext.rapier.EventQueue(true);
 				while (!signal.aborted) {
-					physicsContext.world.step();
+					physicsContext.world.step(eventQueue);
+					eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+						console.log("got physics event");
+						const collider1 = physicsContext.world.getCollider(handle1);
+						const collider2 = physicsContext.world.getCollider(handle2);
+						if (this.gameElement !== undefined && this.gameElement !== null) {
+							console.log("sending collision event");
+							this.gameElement.handleCollisionEvent(collider1, collider2, started);
+							console.log("sent collision event");
+						} else {
+							console.log("ignoring event - no gameElement");
+						}
+					});
 
 					if (context !== undefined && PHYSICS_DEBUG) {
 						context.reset();
@@ -74,7 +91,10 @@ export class PhysicsWorldElement extends LitElement {
 					await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 				}
 			},
-			args: () => [this.physics, this.canvasElement]
+			args: () => [this.physics, this.canvasElement],
+			onError: (error) => {
+				console.error(error);
+			}
 		});
 
 		this.resizeController = new ResizeController(
@@ -160,7 +180,7 @@ export class PhysicsWorldElement extends LitElement {
 	protected render(): HTMLTemplateResult {
 		return html`
 			<canvas></canvas>
-			<slot></slot>
+			<curse-game></curse-game>
 		`;
 	}
 

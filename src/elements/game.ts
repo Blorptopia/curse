@@ -1,5 +1,5 @@
 import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css, type PropertyValues } from "lit";
-import { customElement, query, state } from "lit/decorators.js";
+import { customElement, property, query, state } from "lit/decorators.js";
 import "./customer_portrait";
 import "./hot_plate";
 import "./cup";
@@ -19,13 +19,15 @@ import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
 import { consume } from "@lit/context";
 import { physicsContext, type PhysicsContext } from "../lib/physics_context";
-import type { ImpulseJoint, RigidBody, Collider } from "@dimforge/rapier2d-compat";
+import { type ImpulseJoint, type RigidBody, type Collider, Vector2 } from "@dimforge/rapier2d-compat";
 import type { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import type { BoundingBox, PhysicsUserData } from "../types/physics";
 import type { GameEntity } from "../types/entity";
 import { Task } from "@lit/task";
 import type { PlaceIngredientData, PlaceItemData } from "../types/place";
+import { ConicalFlaskBaseElement } from "./flask/conical";
+import { IngredientIconElement } from "./ingredient_icon";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -118,7 +120,6 @@ export class GameElement extends LitElement {
 			<div
 				id="window-frame"
 				@dragover=${(event: DragEvent) => {
-					console.log(event.dataTransfer!.types);
 					const types = event.dataTransfer!.types;
 					
 					const isValid = types.includes("curse/item") || types.includes("curse/ingredient");
@@ -147,6 +148,8 @@ export class GameElement extends LitElement {
 						}
 						this.balance = newBalance;
 
+						const entityId = crypto.randomUUID();
+
 						const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
 
 						const halfHeightWorld = item.sizePixels.height / pixelDensity / 2;
@@ -164,7 +167,8 @@ export class GameElement extends LitElement {
 							boundingBox: {
 								hh: halfHeightWorld,
 								hw: halfHeightWorld
-							}
+							},
+							entityId
 						} satisfies PhysicsUserData;
 						rigidBody.setAdditionalMassProperties(rigidBody.mass(), {x: 0, y: -halfHeightWorld / 1.5}, 0, true)
 						
@@ -172,6 +176,11 @@ export class GameElement extends LitElement {
 						if (item.itemId === "CONICAL_FLASK") {
 							visualElement = document.createElement("curse-conical-flask");
 							visualElement.shouldBeDraggable = false;
+
+							const topSensorCollider = this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(halfWidthWorld / 2, 0.01), rigidBody);
+							topSensorCollider.setTranslationWrtParent({x: 0, y: -halfHeightWorld});
+							topSensorCollider.setSensor(true);
+							topSensorCollider.setActiveEvents(1);
 						}
 						if (item.itemId === "SOLO_CUP") {
 							visualElement = document.createElement("curse-cup");
@@ -182,7 +191,6 @@ export class GameElement extends LitElement {
 						}
 						visualElement.classList.add("entity", "ingredient");
 						this.entitiesContainerElement.appendChild(visualElement);
-						const entityId = crypto.randomUUID();
 						this.entities[entityId] = {
 							rigidBody,
 							size: {height: halfHeightWorld, width: halfWidthWorld},
@@ -196,6 +204,7 @@ export class GameElement extends LitElement {
 							return;
 						}
 						this.balance = newBalance;
+						const entityId = crypto.randomUUID();
 
 						const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
 
@@ -212,16 +221,16 @@ export class GameElement extends LitElement {
 							boundingBox: {
 								hh: halfSizeWorld,
 								hw: halfSizeWorld
-							}
+							},
+							entityId
 						} satisfies PhysicsUserData;
-						rigidBody.setAdditionalMassProperties(rigidBody.mass(), {x: 0, y: -halfSizeWorld / 1.5}, 0, true)
+						rigidBody.setAdditionalMassProperties(rigidBody.mass() * 2, {x: 0, y: -halfSizeWorld / 1.5}, 0, true)
 
 						const visualElement = document.createElement("curse-ingredient-icon");
 						visualElement.setAttribute("ingredientid", ingredient.ingredientId);
 						visualElement.shouldBeDraggable = false;
 						visualElement.classList.add("entity", "ingredient");
 						this.entitiesContainerElement.appendChild(visualElement);
-						const entityId = crypto.randomUUID();
 						this.entities[entityId] = {
 							rigidBody,
 							size: {height: halfSizeWorld, width: halfSizeWorld},
@@ -247,6 +256,7 @@ export class GameElement extends LitElement {
 					}, true);
 				}}
 				@mousedown=${(event: MouseEvent) => {
+					event.preventDefault();
 					if (this.physics === undefined) {
 						return;
 					}
@@ -510,8 +520,21 @@ export class GameElement extends LitElement {
 			},
 
 		];
+		const JOANY_INTERACTIONS: OrderTemplate[] = [
+			{
+				name: "Confidence potion",
+				description: [
+					"Hey I could need some help",
+					"I need some confidence for this job interview, could you help me out?"
+				],
+				customerId: "JOANY",
+				targetColor: "#FFFF00",
+				baseValue: 1
+			},
+		];
 		const templates: OrderTemplate[] = [];
 		if (this.dayIndex === 0) {
+			templates.push(JOANY_INTERACTIONS[0]);
 			templates.push(JACK_INTERACTIONS[0]);
 		}
 		if (this.dayIndex === 1) {
@@ -652,6 +675,56 @@ export class GameElement extends LitElement {
 			hh
 		}
 		
+	}
+	public handleCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
+		console.log("game got collision event");
+		if (!started) {
+			console.log("ignoring - not started");
+			return;
+		}
+		const rigidBody1 = collider1.parent();
+		const rigidBody2 = collider2.parent();
+		
+		this.handlePlaceItemCollisionEvent(rigidBody1, rigidBody2);
+
+	}
+	private handlePlaceItemCollisionEvent(rigidBody1: RigidBody | null, rigidBody2: RigidBody | null): void {
+		if (rigidBody1 === null || rigidBody2 === null) {
+			console.log("ignoring - no parent");
+			return;
+		}
+		if (this.physics === undefined) {
+			console.log("no physics - ignoring event");
+			return;
+		}
+		const userData1 = rigidBody1.userData as PhysicsUserData | undefined;
+		const userData2 = rigidBody2.userData as PhysicsUserData | undefined;
+
+		const entity1Id = userData1?.entityId;
+		const entity2Id = userData2?.entityId;
+
+		if (entity1Id === undefined || entity2Id === undefined) {
+			console.log("ignoring - no entity id");
+			return;
+		}
+
+		const entity1 = this.entities[entity1Id]!;
+		const entity2 = this.entities[entity2Id]!;
+
+
+		if (entity1.element instanceof ConicalFlaskBaseElement && entity2.element instanceof IngredientIconElement) {
+			entity2.element.remove();
+			delete this.entities[entity2Id];
+			this.physics.world.removeRigidBody(rigidBody2);
+			entity1.element.addIngredient(entity2.element.ingredientId);
+		}
+		if (entity2.element instanceof ConicalFlaskBaseElement && entity1.element instanceof IngredientIconElement) {
+			entity1.element.remove();
+			delete this.entities[entity1Id];
+			this.physics.world.removeRigidBody(rigidBody1);
+			entity2.element.addIngredient(entity1.element.ingredientId);
+
+		}
 	}
 	public static styles?: CSSResultGroup = css`
 		#window-frame {

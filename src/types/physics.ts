@@ -10,4 +10,5 @@ export type PhysicsUserData = {
 		hw: number;
 		hh: number;
 	};
+	entityId?: string;
 };
