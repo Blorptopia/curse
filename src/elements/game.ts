@@ -237,7 +237,8 @@ export class GameElement extends LitElement {
 					const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
 					const xInWorldSpace = event.pageX / pixelDensity;
 					const yInWorldSpace = event.pageY / pixelDensity;
-					const hit = this.physics.world.projectPoint({x: xInWorldSpace, y: yInWorldSpace}, true);
+					const ray = new this.physics.rapier.Ray({x: xInWorldSpace, y: yInWorldSpace}, {x: 0, y: 0});
+					const hit = this.physics.world.castRay(ray, 1, true);
 					if (hit === null) {
 						return;
 					}
