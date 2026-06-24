@@ -1,7 +1,8 @@
 import { type HTMLTemplateResult, LitElement, html, type CSSResultGroup, css } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, query } from "lit/decorators.js";
 import type { IngredientId } from "../types/ingredient";
 import BurgerURL from "../assets/ingredients/burger.png";
+import type { PlaceIngredientData } from "../types/place";
 
 const INGREDIENT_TO_IMAGES = {
 	BLUE_PILL: "",
@@ -13,9 +14,16 @@ const INGREDIENT_TO_IMAGES = {
 export class IngredientIconElement extends LitElement {
 	@property({type: String})
 	public ingredientId: IngredientId;
+	@property({type: Boolean})
+	public shouldBeDraggable: boolean;
+
+	// Elements
+	@query("img")
+	private imageElement?: HTMLImageElement;
 
 	public constructor() {
 		super();
+		this.shouldBeDraggable = true;
 		this.ingredientId = "BLUE_PILL";
 	}
 	protected render(): HTMLTemplateResult {
@@ -23,11 +31,17 @@ export class IngredientIconElement extends LitElement {
 	   	return html`
 			<img
 				src=${imageUrl}
-				?draggable=${this.draggable}
+				.draggable=${this.shouldBeDraggable}
 				alt=""
 				@dragstart=${(event: DragEvent) => {
-					event.dataTransfer!.setData("curse/ingredient", this.ingredientId);
-					console.log(event.dataTransfer!.types);
+					const imageElement = this.imageElement!;
+					const rect = imageElement.getBoundingClientRect();
+					const payload: PlaceIngredientData = {
+						ingredientId: this.ingredientId,
+						sizePixels: rect.height
+					};
+					event.dataTransfer!.setData("curse/ingredient", JSON.stringify(payload));
+					console.log("aye");
 				}}
 			>
 		`;

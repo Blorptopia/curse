@@ -25,6 +25,7 @@ import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import type { BoundingBox } from "../types/physics";
 import type { GameEntity } from "../types/entity";
 import { Task } from "@lit/task";
+import type { PlaceIngredientData, PlaceItemData } from "../types/place";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -118,8 +119,8 @@ export class GameElement extends LitElement {
 				}}
 				@drop=${(event: DragEvent) => {
 					event.preventDefault();
-					const itemId = event.dataTransfer!.getData("curse/item");
-					const ingredientId = event.dataTransfer!.getData("curse/ingredient");
+					const rawItem = event.dataTransfer!.getData("curse/item")
+					const rawIngredient = event.dataTransfer!.getData("curse/ingredient")
 
 					if (this.physics === undefined) {
 						throw new Error("cannot handle drop - missing physics");
@@ -128,29 +129,32 @@ export class GameElement extends LitElement {
 						throw new Error("entitiesContainerElement is not defined");
 					}
 
-					if (itemId !== "") {
+					if (rawItem !== "") {
+						const item = JSON.parse(rawItem) as PlaceItemData;
 						alert("item");
 					}
-					if (ingredientId !== "") {
-						const sizePixels = .1;
-						const sizeWorld = 0.035;
-						const rigidBody = this.physics.world.createRigidBody(this.physics.rapier.RigidBodyDesc.dynamic());
-						this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(sizeWorld, sizeWorld), rigidBody);
-
+					if (rawIngredient !== "") {
+						const ingredient = JSON.parse(rawIngredient) as PlaceIngredientData;
 						const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
+
+						const sizePixels = ingredient.sizePixels;
+						const halfSizeWorld = sizePixels / pixelDensity / 2;
+						const rigidBody = this.physics.world.createRigidBody(this.physics.rapier.RigidBodyDesc.dynamic());
+						this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(halfSizeWorld, halfSizeWorld), rigidBody);
+
 						const x = event.offsetX / pixelDensity;
 						const y = event.offsetY / pixelDensity;
 						
 						rigidBody.setTranslation({x, y}, true);
 
 						const visualElement = document.createElement("curse-ingredient-icon");
-						visualElement.setAttribute("ingredientid", ingredientId);
+						visualElement.setAttribute("ingredientid", ingredient.ingredientId);
 						visualElement.setAttribute("draggable", "false");
 						visualElement.classList.add("entity", "ingredient");
 						this.entitiesContainerElement.appendChild(visualElement);
 						this.entities.push({
 							rigidBody,
-							size: {height: sizeWorld, width: sizeWorld},
+							size: {height: halfSizeWorld, width: halfSizeWorld},
 							element: visualElement
 						});
 					}
@@ -216,9 +220,6 @@ export class GameElement extends LitElement {
 					</dl>
 				</div>
 				<curse-ingredient-icon
-					@dragstart=${(event: DragEvent) => {
-						event.dataTransfer!.setData("curse/ingredient", ingredientId);
-					}}
 					.ingredientId=${ingredientId}
 				></curse-ingredient-icon>
 			</div>
