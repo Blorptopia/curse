@@ -29,6 +29,9 @@ export class ConicalFlaskBaseElement extends LitElement {
 	// Attributes
 	private renderTask: Task<[HTMLCanvasElement?], void>;
 
+	private liquidResolution: number;
+	private wavelength: number;
+
 	public constructor() {
 		super();
 		this.angleRad = 0;
@@ -38,7 +41,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 		this.instances = {};
 
 		this.renderTask = new Task(this, {
-			task: async ([canvas, disabled], {signal}) => {
+			task: async ([canvas, disabled], { signal }) => {
 				if (canvas === undefined) {
 					return;
 				}
@@ -48,12 +51,56 @@ export class ConicalFlaskBaseElement extends LitElement {
 					return;
 				}
 				while (!signal.aborted) {
-					// TODO: Render here!
+					const angleIncrement = (Math.PI * 2) / this.liquidResolution;
+					const height = canvas.height / 4;
+					let wave: number[] = [];
+
+					const maskImage = new Image();
+					maskImage.src = "./src/assets/flask/conical/mask.png";
+					context.imageSmoothingEnabled = false;
+					context.save()
+					context.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
+					context.globalCompositeOperation = "source-in";
+
+					const tempCanvas = document.createElement("canvas");
+					const tempContext = tempCanvas.getContext("2d")!;
+					tempCanvas.width = canvas.width;
+					tempCanvas.height = canvas.height;
+
+
+					tempContext.fillStyle = "#2b6be3";
+					tempContext.beginPath();
+					tempContext.moveTo(0, height);
+					for (let index = 0; index <= this.liquidResolution; index++) {
+						wave.push(height + Math.sin(angleIncrement * index) * this.wavelength);
+						tempContext.lineTo(canvas.width / this.liquidResolution * index, height + Math.sin(angleIncrement * index) * this.wavelength);
+					}
+					tempContext.lineTo(canvas.width, canvas.height);
+					tempContext.lineTo(0, canvas.height);
+					tempContext.fill();
+
+					tempContext.fillStyle = "#34faf3";
+					tempContext.beginPath();
+					tempContext.moveTo(0, height);
+					for (let [index, point] of wave.toReversed().entries()) {
+						tempContext.lineTo(canvas.width / this.liquidResolution * index, point);
+					}
+					tempContext.lineTo(canvas.width, canvas.height);
+					tempContext.lineTo(0, canvas.height);
+					tempContext.fill();
+
+					context.drawImage(tempCanvas, 0, 0);
+					context.restore()
+
+					context.drawImage(this.imageElement!, 0, 0, canvas.width, canvas.height);
+
 					await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 				}
 			},
 			args: () => [this.canvasElement, this.disabled] as const
 		});
+		this.liquidResolution = 20;
+		this.wavelength = 10;
 	}
 	protected render(): HTMLTemplateResult {
 	   	return html`
@@ -78,7 +125,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 				}}
 			>
 			<canvas></canvas>
-		`; 
+		`;
 	}
 	public static styles?: CSSResultGroup = css`
 		:host {
@@ -105,7 +152,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 			left: 0;
 			height: 100%;
 			width: 100%;
-			
+
 			pointer-events: none;
 		}
 	`;
@@ -129,7 +176,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 
 		const oldAngleRad = changedProperties.get("angleRad") as number | undefined;
 		// console.log({oldAngleRad, angleRad: this.angleRad});
-		
+
 		// This is broken. @platinumaniac pls fix kthx
 		// if (oldAngleRad !== undefined) {
 		// 	if (oldAngleRad > 0 && this.angleRad < 0) {
