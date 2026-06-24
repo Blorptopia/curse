@@ -83,8 +83,8 @@ export class ConicalFlaskBaseElement extends LitElement {
 	public static styles?: CSSResultGroup = css`
 		:host {
 			display: block;
-			--source-height: 45;
-			--source-width: 28;
+			--source-height: 109;
+			--source-width: 74;
 			height: calc(var(--source-height) * var(--size-multiplier));
 			width: calc(var(--source-width) * var(--size-multiplier));
 			position: relative;

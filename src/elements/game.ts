@@ -50,7 +50,7 @@ export class GameElement extends LitElement {
 
 	// Attributes
 	private constantColliders: Collider[];
-	private entities: GameEntity[];
+	private entities: Partial<Record<string, GameEntity>>;
 	private cursorRigidBody?: RigidBody;
 	private cursorJoint?: ImpulseJoint;
 
@@ -72,7 +72,7 @@ export class GameElement extends LitElement {
 		this.balance = 500;
 		
 		this.constantColliders = [];
-		this.entities = [];
+		this.entities = {};
 
 		// We only care about it for state updates
 		new ResizeController(this, {
@@ -93,7 +93,10 @@ export class GameElement extends LitElement {
 				while (!signal.aborted) {
 					await new Promise<void>(resolve => {requestAnimationFrame(() => resolve())});
 
-					for (const entity of this.entities) {
+					for (const entity of Object.values(this.entities)) {
+						if (entity === undefined) {
+							continue;
+						}
 						const translation = entity.rigidBody.translation();
 						const rotation = entity.rigidBody.rotation();
 						const x = (translation.x - entity.size.width) * pixelDensity;
@@ -179,11 +182,12 @@ export class GameElement extends LitElement {
 						}
 						visualElement.classList.add("entity", "ingredient");
 						this.entitiesContainerElement.appendChild(visualElement);
-						this.entities.push({
+						const entityId = crypto.randomUUID();
+						this.entities[entityId] = {
 							rigidBody,
 							size: {height: halfHeightWorld, width: halfWidthWorld},
 							element: visualElement
-						});
+						};
 					}
 					if (rawIngredient !== "") {
 						const ingredient = JSON.parse(rawIngredient) as PlaceIngredientData;
@@ -217,11 +221,12 @@ export class GameElement extends LitElement {
 						visualElement.shouldBeDraggable = false;
 						visualElement.classList.add("entity", "ingredient");
 						this.entitiesContainerElement.appendChild(visualElement);
-						this.entities.push({
+						const entityId = crypto.randomUUID();
+						this.entities[entityId] = {
 							rigidBody,
 							size: {height: halfSizeWorld, width: halfSizeWorld},
 							element: visualElement
-						});
+						};
 					}
 					
 				}}
@@ -820,7 +825,7 @@ export class GameElement extends LitElement {
 		}
 		.listing-details {
 			position: absolute;
-			position-area: top center;
+			position-area: top right;
 			z-index: 100;
 
 			width: max-content;
@@ -850,7 +855,7 @@ export class GameElement extends LitElement {
 			position: absolute;
 		}
 		curse-conical-flask {
-			--size-multiplier: 0.5rem;
+			--size-multiplier: 0.2rem;
 		}
 	`;
 }
