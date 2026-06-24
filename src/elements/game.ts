@@ -149,7 +149,7 @@ export class GameElement extends LitElement {
 
 						const visualElement = document.createElement("curse-ingredient-icon");
 						visualElement.setAttribute("ingredientid", ingredient.ingredientId);
-						visualElement.setAttribute("draggable", "false");
+						visualElement.shouldBeDraggable = false;
 						visualElement.classList.add("entity", "ingredient");
 						this.entitiesContainerElement.appendChild(visualElement);
 						this.entities.push({
