@@ -127,6 +127,7 @@ export class HotPlateElement extends LitElement {
 			audio.play();
 
 			this.fireAudio.pause();
+			this.fireAudio.fastSeek(Math.random() * 5);
 		}
 
 	}
