@@ -77,6 +77,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 			height: calc(var(--source-height) * var(--size-multiplier));
 			width: calc(var(--source-width) * var(--size-multiplier));
 			position: relative;
+			user-select: none;
 		}
 		img {
 			display: block;
