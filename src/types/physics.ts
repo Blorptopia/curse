@@ -4,3 +4,10 @@ export type BoundingBox = {
 	hw: number;
 	hh: number;
 };
+
+export type PhysicsUserData = {
+	boundingBox?: {
+		hw: number;
+		hh: number;
+	};
+};

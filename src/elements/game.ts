@@ -19,10 +19,10 @@ import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
 import { consume } from "@lit/context";
 import { physicsContext, type PhysicsContext } from "../lib/physics_context";
-import { type Collider } from "@dimforge/rapier2d-compat";
+import { ImpulseJoint, RevoluteImpulseJoint, RigidBody, type Collider } from "@dimforge/rapier2d-compat";
 import type { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
-import type { BoundingBox } from "../types/physics";
+import type { BoundingBox, PhysicsUserData } from "../types/physics";
 import type { GameEntity } from "../types/entity";
 import { Task } from "@lit/task";
 import type { PlaceIngredientData, PlaceItemData } from "../types/place";
@@ -48,8 +48,9 @@ export class GameElement extends LitElement {
 
 	// Attributes
 	private constantColliders: Collider[];
-	private resizeController: ResizeController;
 	private entities: GameEntity[];
+	private cursorRigidBody?: RigidBody;
+	private cursorJoint?: ImpulseJoint;
 
 	// Elements
 	@query("curse-hot-plate")
@@ -69,7 +70,9 @@ export class GameElement extends LitElement {
 		
 		this.constantColliders = [];
 		this.entities = [];
-		this.resizeController = new ResizeController(this, {
+
+		// We only care about it for state updates
+		new ResizeController(this, {
 			callback: (entries) => {
 				if (entries.length > 0) {
 					return entries[0].contentRect;
@@ -94,7 +97,6 @@ export class GameElement extends LitElement {
 						const y = (translation.y - entity.size.height) * pixelDensity;
 						entity.element.style.left = `${x}px`;
 						entity.element.style.top = `${y}px`;
-						console.log({rotation});
 						entity.element.style.transform = `rotate(${rotation}rad)`;
 					}
 				}
@@ -143,6 +145,13 @@ export class GameElement extends LitElement {
 						const y = event.offsetY / pixelDensity;
 						
 						rigidBody.setTranslation({x, y}, true);
+
+						rigidBody.userData = {
+							boundingBox: {
+								hh: halfHeightWorld,
+								hw: halfHeightWorld
+							}
+						} satisfies PhysicsUserData;
 						
 						let visualElement: HTMLElement | undefined = undefined;
 						if (item.itemId === "CONICAL_FLASK") {
@@ -177,6 +186,12 @@ export class GameElement extends LitElement {
 						const y = event.offsetY / pixelDensity;
 						
 						rigidBody.setTranslation({x, y}, true);
+						rigidBody.userData = {
+							boundingBox: {
+								hh: halfSizeWorld,
+								hw: halfSizeWorld
+							}
+						} satisfies PhysicsUserData;
 
 						const visualElement = document.createElement("curse-ingredient-icon");
 						visualElement.setAttribute("ingredientid", ingredient.ingredientId);
@@ -190,6 +205,57 @@ export class GameElement extends LitElement {
 						});
 					}
 					
+				}}
+				@mousemove=${(event: MouseEvent) => {
+					if (this.cursorRigidBody === undefined) {
+						return;
+					}
+					if (this.physics === undefined) {
+						return;
+					}
+					const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
+					const xInWorldSpace = event.pageX / pixelDensity;
+					const yInWorldSpace = event.pageY / pixelDensity;
+
+					this.cursorRigidBody.setTranslation({
+						x: xInWorldSpace,
+						y: yInWorldSpace
+					}, true);
+				}}
+				@mousedown=${(event: MouseEvent) => {
+					if (this.physics === undefined) {
+						return;
+					}
+					if (this.cursorRigidBody === undefined) {
+						return;
+					}
+					if (this.cursorJoint !== undefined) {
+						this.physics.world.removeImpulseJoint(this.cursorJoint, true);
+					}
+					const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
+					const xInWorldSpace = event.pageX / pixelDensity;
+					const yInWorldSpace = event.pageY / pixelDensity;
+					const hit = this.physics.world.projectPoint({x: xInWorldSpace, y: yInWorldSpace}, true);
+					if (hit === null) {
+						return;
+					}
+					const rigidBody = hit.collider.parent();
+					if (!rigidBody) {
+						return;
+					}
+					const userData = rigidBody.userData as PhysicsUserData | undefined;
+					const halfHeight = userData?.boundingBox?.hh ?? 0;
+					const holdPosition = -(halfHeight * 0.75);
+					const jointData = this.physics.rapier.JointData.revolute({x: 0, y: 0}, {x: 0, y: holdPosition});
+					this.cursorJoint = this.physics.world.createImpulseJoint(jointData, this.cursorRigidBody, rigidBody, true);
+				}}
+				@mouseup=${() => {
+					if (this.physics === undefined) {
+						return;
+					}
+					if (this.cursorJoint !== undefined) {
+						this.physics.world.removeImpulseJoint(this.cursorJoint, true);
+					}
 				}}
 			>
 				<div id="left-window" class="window"></div>
@@ -494,12 +560,21 @@ export class GameElement extends LitElement {
 		if (this.physics === undefined) {
 			return;
 		}
+		this.updateConstantColliders(this.physics);
+		this.updateCursorRigidBody(this.physics);
+	}
+	private updateCursorRigidBody(physics: PhysicsContext): void {
+		if (this.cursorRigidBody === undefined) {
+			this.cursorRigidBody = physics.world.createRigidBody(physics.rapier.RigidBodyDesc.fixed());
+		}
+	}
+	private updateConstantColliders(physics: PhysicsContext): void {
 		if (this.hotPlateElement === undefined) {
 			return;
 		}
 
 		for (const constantCollider of this.constantColliders) {
-			this.physics.world.removeCollider(constantCollider, true);
+			physics.world.removeCollider(constantCollider, true);
 		}
 		this.constantColliders = [];
 
@@ -508,11 +583,12 @@ export class GameElement extends LitElement {
 		].filter(element => element !== undefined);
 		
 		for (const colldierElement of constantColliderElements) {
-			const box = this.createGameBoundsForElement(colldierElement, this.physics);
-			const collider = this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(box.hw, box.hh));
+			const box = this.createGameBoundsForElement(colldierElement, physics);
+			const collider = physics.world.createCollider(physics.rapier.ColliderDesc.cuboid(box.hw, box.hh));
 			collider.setTranslation({x: box.x, y: box.y});
 			this.constantColliders.push(collider);
 		}
+
 	}
 	private createGameBoundsForElement(element: HTMLElement, physics: PhysicsContext): BoundingBox {
 		let rect = element.getBoundingClientRect();
