@@ -5,7 +5,7 @@ import "./hot_plate";
 import "./cup";
 import "./ingredient_icon";
 import "./customer_shadow";
-import "./flask";
+import "./flask/conical";
 import "./physics_world";
 import { map } from "lit/directives/map.js";
 import type { Order, OrderTemplate } from "../types/order";
@@ -19,7 +19,7 @@ import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
 import { consume } from "@lit/context";
 import { physicsContext, type PhysicsContext } from "../lib/physics_context";
-import { ColliderDesc, type Collider, type RigidBody } from "@dimforge/rapier2d-compat";
+import { type Collider } from "@dimforge/rapier2d-compat";
 import type { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import type { BoundingBox } from "../types/physics";
@@ -131,7 +131,38 @@ export class GameElement extends LitElement {
 
 					if (rawItem !== "") {
 						const item = JSON.parse(rawItem) as PlaceItemData;
-						alert("item");
+						const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
+
+						const halfHeightWorld = item.sizePixels.height / pixelDensity / 2;
+						const halfWidthWorld = item.sizePixels.width / pixelDensity / 2;
+						console.log({halfHeightWorld, halfWidthWorld, pixelDensity});
+						const rigidBody = this.physics.world.createRigidBody(this.physics.rapier.RigidBodyDesc.dynamic());
+						this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(halfWidthWorld, halfHeightWorld), rigidBody);
+
+						const x = event.offsetX / pixelDensity;
+						const y = event.offsetY / pixelDensity;
+						
+						rigidBody.setTranslation({x, y}, true);
+						
+						let visualElement: HTMLElement | undefined = undefined;
+						if (item.itemId === "CONICAL_FLASK") {
+							visualElement = document.createElement("curse-conical-flask");
+							visualElement.disabled = true;
+						}
+						if (item.itemId === "SOLO_CUP") {
+							visualElement = document.createElement("curse-cup");
+							visualElement.shouldBeDraggable = false;
+						}
+						if (visualElement === undefined) {
+							throw new Error(":(");
+						}
+						visualElement.classList.add("entity", "ingredient");
+						this.entitiesContainerElement.appendChild(visualElement);
+						this.entities.push({
+							rigidBody,
+							size: {height: halfHeightWorld, width: halfWidthWorld},
+							element: visualElement
+						});
 					}
 					if (rawIngredient !== "") {
 						const ingredient = JSON.parse(rawIngredient) as PlaceIngredientData;
@@ -235,7 +266,7 @@ export class GameElement extends LitElement {
 			itemIconFragment = html`<curse-cup class="icon"></curse-cup>`;
 		}
 		if (itemId === "CONICAL_FLASK") {
-			itemIconFragment = html`<curse-flask class="icon" disabled></curse-flask>`;
+			itemIconFragment = html`<curse-conical-flask class="icon" disabled></curse-conical-flask>`;
 		}
 
 		return html`
@@ -275,7 +306,7 @@ export class GameElement extends LitElement {
 				` : html`
 					<curse-customer-shadow
 						customerid=${customerId}
-					></curse-customer-portrait>
+					></curse-customer-shadow>
 				`}
 			</div>
 		`
@@ -543,6 +574,7 @@ export class GameElement extends LitElement {
 
 			display: flex;
 			gap: 1rem;
+			align-items: flex-end;
 		}
 		.customer-container {
 			position: absolute;
@@ -682,6 +714,9 @@ export class GameElement extends LitElement {
 
 		.entity {
 			position: absolute;
+		}
+		curse-conical-flask {
+			--size-multiplier: 0.5rem;
 		}
 	`;
 }

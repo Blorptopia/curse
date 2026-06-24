@@ -3,7 +3,10 @@ import type { ItemId } from "./item";
 
 export type PlaceItemData = {
 	itemId: ItemId;
-	sizePixels: number;
+	sizePixels: {
+		height: number;
+		width: number;
+	}
 };
 export type PlaceIngredientData = {
 	ingredientId: IngredientId;

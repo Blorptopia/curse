@@ -41,7 +41,6 @@ export class IngredientIconElement extends LitElement {
 						sizePixels: rect.height
 					};
 					event.dataTransfer!.setData("curse/ingredient", JSON.stringify(payload));
-					console.log("aye");
 				}}
 			>
 		`;
