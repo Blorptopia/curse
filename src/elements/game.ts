@@ -45,6 +45,8 @@ export class GameElement extends LitElement {
 	private dialogIndex: number;
 	@state()
 	private productPurchaseCount: Partial<Record<ItemId | IngredientId, number>>;
+	@state()
+	private balance: number;
 
 	// Attributes
 	private constantColliders: Collider[];
@@ -67,6 +69,7 @@ export class GameElement extends LitElement {
 		this.orders = this.createOrders();
 		this.dialogIndex = 0;
 		this.productPurchaseCount = {};
+		this.balance = 500;
 		
 		this.constantColliders = [];
 		this.entities = [];
@@ -273,6 +276,7 @@ export class GameElement extends LitElement {
 				</div>
 			</div>
 			<section id="shelf">
+				<div id="balance">${this.balance}$</div>
 				<div id="items-row" class="shelf-row">
 					${map(Object.keys(ITEMS) as ItemId[], itemId => this.renderItemListing(itemId))}
 				</div>
@@ -644,6 +648,17 @@ export class GameElement extends LitElement {
 			display: flex;
 			flex-direction: column;
 			gap: 1rem;
+
+			position: relative;
+		}
+		#balance {
+			position: absolute;
+			right: 1rem;
+			padding: 1rem;
+			background: black;
+			color: green;
+			font-weight: bold;
+			font-size: 2rem;
 		}
 		.shelf-row {
 			background: #a15d7b;
@@ -773,6 +788,7 @@ export class GameElement extends LitElement {
 		.listing-details {
 			position: absolute;
 			position-area: top center;
+			z-index: 100;
 
 			width: max-content;
 
@@ -780,6 +796,7 @@ export class GameElement extends LitElement {
 			color: black;
 			padding: 1rem;
 			border-radius: 1rem;
+			border: .1rem solid black;
 		}
 		.listing:not(:hover) > .listing-details {
 			display: none;
