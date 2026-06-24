@@ -19,7 +19,7 @@ import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
 import { consume } from "@lit/context";
 import { physicsContext, type PhysicsContext } from "../lib/physics_context";
-import { ImpulseJoint, RevoluteImpulseJoint, RigidBody, type Collider } from "@dimforge/rapier2d-compat";
+import type { ImpulseJoint, RigidBody, Collider } from "@dimforge/rapier2d-compat";
 import type { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import type { BoundingBox, PhysicsUserData } from "../types/physics";
@@ -294,7 +294,7 @@ export class GameElement extends LitElement {
 					${map(Object.keys(ITEMS) as ItemId[], itemId => this.renderItemListing(itemId))}
 				</div>
 				<div id="ingredients-row" class="shelf-row">
-					${map(Object.keys(INGREDIENTS) as IngredientId[], ingredientId => this.renderIngredientListing(ingredientId))}
+					${map(this.getIngredientsForDay() as IngredientId[], ingredientId => this.renderIngredientListing(ingredientId))}
 				</div>
 			</section>
 		`
@@ -573,6 +573,12 @@ export class GameElement extends LitElement {
 			return 350;
 		}
 		return 550;
+	}
+	private getIngredientsForDay(): IngredientId[] {
+		if (this.dayIndex === 0) {
+			return ["BURGER"];
+		}
+		return ["RED_PILL", "BLUE_PILL"];
 	}
 	protected willUpdate(changedProperties: PropertyValues): void {
 	    super.willUpdate(changedProperties);
