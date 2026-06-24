@@ -90,8 +90,7 @@ export class HotPlateElement extends LitElement {
 	private async handleStateTransition(from: HotPlateState): Promise<void> {
 		console.log(`transition from ${from} to ${this.state}`);
 		if (this.state === "activating") {
-			const audioUrl = PRESS_AUDIO_URLS[Math.floor(Math.random() * PRESS_AUDIO_URLS.length)];
-			const audio = new Audio(audioUrl);
+			const audio = this.pressAudios[Math.floor(Math.random() * this.pressAudios.length)];
 			audio.addEventListener("ended", () => {
 				if (this.desiredToBePressed) {
 					this.state = "pressed";
@@ -113,8 +112,7 @@ export class HotPlateElement extends LitElement {
 			}
 		}
 		if (this.state === "deactivating") {
-			const audioUrl = RELEASE_AUDIO_URLS[Math.floor(Math.random() * RELEASE_AUDIO_URLS.length)];
-			const audio = new Audio(audioUrl);
+			const audio = this.releaseAudios[Math.floor(Math.random() * this.releaseAudios.length)];
 			audio.addEventListener("ended", () => {
 				if (this.desiredToBePressed) {
 					this.state = "activating";
