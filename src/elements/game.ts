@@ -136,6 +136,13 @@ export class GameElement extends LitElement {
 
 					if (rawItem !== "") {
 						const item = JSON.parse(rawItem) as PlaceItemData;
+						
+						const newBalance = this.balance - ITEMS[item.itemId].price;
+						if (newBalance < 0) {
+							return;
+						}
+						this.balance = newBalance;
+
 						const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
 
 						const halfHeightWorld = item.sizePixels.height / pixelDensity / 2;
@@ -179,6 +186,12 @@ export class GameElement extends LitElement {
 					}
 					if (rawIngredient !== "") {
 						const ingredient = JSON.parse(rawIngredient) as PlaceIngredientData;
+						const newBalance = this.balance - INGREDIENTS[ingredient.ingredientId].price;
+						if (newBalance < 0) {
+							return;
+						}
+						this.balance = newBalance;
+
 						const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
 
 						const sizePixels = ingredient.sizePixels;
@@ -293,7 +306,7 @@ export class GameElement extends LitElement {
 
 		factFragments.push(html`
 			<dt>Price</dt>
-			<dd class="price">${ingredient.price}$</dd>
+			<dd class="price" ?data-can-afford=${this.balance >= ingredient.price}>${ingredient.price}$</dd>
 	   	`);
 
 		if (ingredient.effects.explodesWhenMixedWith !== undefined) {
@@ -803,6 +816,9 @@ export class GameElement extends LitElement {
 		}
 		.price {
 			color: green;
+		}
+		.price:not([data-can-afford]) {
+			color: red;
 		}
 		dt {
 			font-weight: bold;
