@@ -1,0 +1,43 @@
+body {
+	display: grid;
+	place-items: center;
+}
+#content {
+	display: flex;
+	gap: 1rem;
+	flex-direction: column;
+}
+#side-by-side {
+	display: flex;
+	gap: 1rem;
+}
+
+h1 {
+	margin: 0;
+	font-size: 3rem;
+}
+
+#actions {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	justify-content: center;
+}
+
+.link-button {
+	text-decoration: none;
+	color: inherit;
+	padding: 1rem;
+	border-radius: .25rem;
+
+	font-size: 2rem;
+}
+.primary {
+	background: #875f90;
+}
+.primary:hover {
+	background: #773a7c;
+}
+.secondary:hover {
+	color: #ccc;
+}

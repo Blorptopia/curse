@@ -2,13 +2,24 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/src/assets/wizard.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Curse</title>
 		<link rel="stylesheet" href="./src/global.css" />
+		<link rel="stylesheet" href="./src/index.css" />
 	</head>
 	<body>
-		<h1>Curse</h1>
-		<a href="/game.html">Open the game</a>
+		<div id="content">
+			<h1>Curse</h1>
+			<div id="side-by-side">
+				<div id="info">
+					<img id="icon" src="/src/assets/wizard.png" alt="">
+				</div>
+				<div id="actions">
+					<a id="start" class="link-button primary" href="/game.html">Start</a>
+					<a id="start" class="link-button secondary" href="/credits.html">Credits</a>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
