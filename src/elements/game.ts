@@ -797,6 +797,7 @@ export class GameElement extends LitElement {
 				width: var(--size);
 				border-radius: 50%;
 			}
+			user-select: none;
 		}
 		.listing-details {
 			position: absolute;
@@ -810,6 +811,8 @@ export class GameElement extends LitElement {
 			padding: 1rem;
 			border-radius: 1rem;
 			border: .1rem solid black;
+
+			user-select: none;
 		}
 		.listing:not(:hover) > .listing-details {
 			display: none;
