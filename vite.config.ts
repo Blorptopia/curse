@@ -8,7 +8,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ENTRYPOINTS = [
 	"index.html",
 	"game.html",
-	"game-over.html"
+	"game-over.html",
+	"credits.html"
 ];
 
 
