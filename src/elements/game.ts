@@ -356,6 +356,14 @@ export class GameElement extends LitElement {
 			itemIconFragment = html`<curse-conical-flask class="icon" disabled></curse-conical-flask>`;
 		}
 
+		const factFragments: HTMLTemplateResult[] = [];
+
+		factFragments.push(html`
+			<dt>Price</dt>
+			<dd class="price" ?data-can-afford=${this.balance >= item.price}>${item.price}$</dd>
+	   	`);
+
+
 		return html`
 			<div
 				class="listing"
@@ -371,6 +379,10 @@ export class GameElement extends LitElement {
 				>
 					<h1>${item.name}</h1>
 					<p>${item.description}</p>
+					<h2>Product facts</h2>
+					<dl>
+						${factFragments}
+					</dl>
 				</div>
 				${itemIconFragment}
 			</div>
