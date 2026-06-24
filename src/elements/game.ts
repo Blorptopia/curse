@@ -147,7 +147,7 @@ export class GameElement extends LitElement {
 						let visualElement: HTMLElement | undefined = undefined;
 						if (item.itemId === "CONICAL_FLASK") {
 							visualElement = document.createElement("curse-conical-flask");
-							visualElement.disabled = true;
+							visualElement.shouldBeDraggable = false;
 						}
 						if (item.itemId === "SOLO_CUP") {
 							visualElement = document.createElement("curse-cup");
@@ -226,7 +226,7 @@ export class GameElement extends LitElement {
 		if (ingredient.effects.explodesWhenMixedWith !== undefined) {
 			factFragments.push(html`
 				<dt>Explodes when mixed with</dt>
-				${ingredient.effects.explodesWhenMixedWith?.map(ingredientId => html`<dd>${INGREDIENTS[ingredientId].name}`)}
+				${ingredient.effects.explodesWhenMixedWith?.map(ingredientId => html`<dd>${INGREDIENTS[ingredientId].name}</dd>`)}
 			`);
 		}
 

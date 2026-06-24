@@ -9,6 +9,8 @@ export class ConicalFlaskBaseElement extends LitElement {
 	// Props
 	@property({type: Boolean})
 	public shouldBeDraggable: boolean;
+	@property({type: Boolean})
+	public disabled: boolean;
 	@property({type: Number})
 	public angleRad: number;
 
@@ -25,15 +27,24 @@ export class ConicalFlaskBaseElement extends LitElement {
 		super();
 		this.angleRad = 0;
 		this.shouldBeDraggable = true;
+		this.disabled = false;
 
 		this.renderTask = new Task(this, {
-			task: async ([canvas], {signal}) => {
+			task: async ([canvas, disabled], {signal}) => {
+				if (canvas === undefined) {
+					return;
+				}
+				const context = canvas.getContext("2d")!;
+				if (disabled) {
+					context.reset();
+					return;
+				}
 				while (!signal.aborted) {
 					// TODO: Render here!
 					await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 				}
 			},
-			args: () => [this.canvasElement] as const
+			args: () => [this.canvasElement, this.disabled] as const
 		})
 	}
 	protected render(): HTMLTemplateResult {
