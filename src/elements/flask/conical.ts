@@ -2,19 +2,39 @@ import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css } f
 import { customElement, property, query } from "lit/decorators.js";
 import FlaskImageURL from "../../assets/flask/conical/image.png";
 import type { PlaceItemData } from "../../types/place";
+import { Task } from "@lit/task";
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {
+	// Props
 	@property({type: Boolean})
 	public shouldBeDraggable: boolean;
+	@property({type: Number})
+	public angleRad: number;
 
 	// Elements
 	@query("img")
 	private imageElement?: HTMLImageElement;
+	@query("canvas")
+	private canvasElement?: HTMLCanvasElement;
+
+	// Attributes
+	private renderTask: Task<[HTMLCanvasElement?], void>;
 
 	public constructor() {
 		super();
+		this.angleRad = 0;
 		this.shouldBeDraggable = true;
+
+		this.renderTask = new Task(this, {
+			task: async ([canvas], {signal}) => {
+				while (!signal.aborted) {
+					// TODO: Render here!
+					await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+				}
+			},
+			args: () => [this.canvasElement] as const
+		})
 	}
 	protected render(): HTMLTemplateResult {
 	   	return html`
