@@ -9,7 +9,7 @@ import PressAudio3URL from "../assets/hot_plate/button/press/3.wav";
 import ReleaseAudio1URL from "../assets/hot_plate/button/release/1.wav";
 import ReleaseAudio2URL from "../assets/hot_plate/button/release/2.wav";
 import ReleaseAudio3URL from "../assets/hot_plate/button/release/3.wav";
-import FireAudioURL from "../assets/hot_plate/fire.wav";
+import FireAudioURL from "../assets/hot_plate/fire.mp3";
 import { IGNITION_OFFSET_MS } from "../config";
 
 const PRESS_AUDIO_URLS: string[] = [
@@ -44,7 +44,7 @@ export class HotPlateElement extends LitElement {
 		this.releaseAudios = RELEASE_AUDIO_URLS.map(url => new Audio(url));
 		this.fireAudio = new Audio(FireAudioURL);
 		this.fireAudio.loop = true;
-		this.fireAudio.volume = .3;
+		this.fireAudio.volume = .1;
 	}
 
 	protected render(): HTMLTemplateResult {
