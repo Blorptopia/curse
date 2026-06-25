@@ -205,4 +205,5 @@ export class ConicalFlaskBaseElement extends LitElement {
 			this.instances[instanceId] = mutator(instance!);
 		}
 	}
+	public registerCrash(magnitude: number): void {}
 }

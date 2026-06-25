@@ -19,7 +19,7 @@ import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
 import { consume } from "@lit/context";
 import { physicsContext, type PhysicsContext } from "../lib/physics_context";
-import { type ImpulseJoint, type RigidBody, type Collider, Vector2 } from "@dimforge/rapier2d-compat";
+import { type ImpulseJoint, type RigidBody, type Collider, Vector2, TempContactForceEvent } from "@dimforge/rapier2d-compat";
 import type { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import type { BoundingBox, PhysicsUserData } from "../types/physics";
@@ -156,7 +156,7 @@ export class GameElement extends LitElement {
 						const halfWidthWorld = item.sizePixels.width / pixelDensity / 2;
 						console.log({halfHeightWorld, halfWidthWorld, pixelDensity});
 						const rigidBody = this.physics.world.createRigidBody(this.physics.rapier.RigidBodyDesc.dynamic());
-						this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(halfWidthWorld, halfHeightWorld), rigidBody);
+						const bodyCollider = this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(halfWidthWorld, halfHeightWorld), rigidBody);
 
 						const x = event.offsetX / pixelDensity;
 						const y = event.offsetY / pixelDensity;
@@ -181,6 +181,9 @@ export class GameElement extends LitElement {
 							topSensorCollider.setTranslationWrtParent({x: 0, y: -halfHeightWorld});
 							topSensorCollider.setSensor(true);
 							topSensorCollider.setActiveEvents(1);
+
+							// Add contact force events so we can destroy it if required
+							bodyCollider.setActiveEvents(2);
 						}
 						if (item.itemId === "SOLO_CUP") {
 							visualElement = document.createElement("curse-cup");
@@ -265,6 +268,7 @@ export class GameElement extends LitElement {
 					}
 					if (this.cursorJoint !== undefined) {
 						this.physics.world.removeImpulseJoint(this.cursorJoint, true);
+						this.cursorJoint = undefined;
 					}
 					const pixelDensity = this.physics.screenSpace.height / STAND_HEIGHT_METERS;
 					const xInWorldSpace = event.pageX / pixelDensity;
@@ -290,6 +294,7 @@ export class GameElement extends LitElement {
 					}
 					if (this.cursorJoint !== undefined) {
 						this.physics.world.removeImpulseJoint(this.cursorJoint, true);
+						this.cursorJoint = undefined;
 					}
 				}}
 			>
@@ -725,6 +730,48 @@ export class GameElement extends LitElement {
 			entity2.element.addIngredient(entity1.element.ingredientId);
 
 		}
+	}
+	public handleContactEvent(event: TempContactForceEvent): void {
+		if (this.physics === undefined) {
+			return;
+		}
+		const magnitude = event.maxForceMagnitude();
+		if (magnitude < 5 || magnitude > 30) {
+			return;
+		}
+		if (this.cursorJoint !== undefined) {
+			console.log(`ignoring crash with ${magnitude}mag due cursor being used (stuck inside something?)`);
+			return;
+		}
+		console.log(`crash @ ${magnitude}`);
+		const collider1 = this.physics.world.getCollider(event.collider1())!;
+		const collider2 = this.physics.world.getCollider(event.collider2())!;
+
+		const rigidBody1 = collider1.parent();
+		const rigidBody2 = collider2.parent();
+
+		if (rigidBody1) {
+			this.handleCrash(rigidBody1, magnitude)
+		}
+		if (rigidBody2) {
+			this.handleCrash(rigidBody2, magnitude)
+		}
+	}
+	private handleCrash(rigidBody: RigidBody, magnitude: number): void {
+		const userData = rigidBody?.userData as PhysicsUserData | undefined;
+		const entityId = userData?.entityId;
+
+		if (entityId === undefined) {
+			return;
+		}
+		const entity = this.entities[entityId];
+		if (entity === undefined) {
+			return;
+		}
+		if (entity.element instanceof ConicalFlaskBaseElement) {
+			entity.element.registerCrash(magnitude);
+		}
+
 	}
 	public static styles?: CSSResultGroup = css`
 		#window-frame {

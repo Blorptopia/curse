@@ -62,13 +62,18 @@ export class PhysicsWorldElement extends LitElement {
 						const collider1 = physicsContext.world.getCollider(handle1);
 						const collider2 = physicsContext.world.getCollider(handle2);
 						if (this.gameElement !== undefined && this.gameElement !== null) {
-							console.log("sending collision event");
 							this.gameElement.handleCollisionEvent(collider1, collider2, started);
-							console.log("sent collision event");
 						} else {
 							console.log("ignoring event - no gameElement");
 						}
 					});
+					eventQueue.drainContactForceEvents(event => {
+						if (this.gameElement !== undefined && this.gameElement !== null) {
+							this.gameElement.handleContactEvent(event);
+						} else {
+							console.log("ignoring event - no gameElement");
+						}
+					})
 
 					if (context !== undefined && PHYSICS_DEBUG) {
 						context.reset();
