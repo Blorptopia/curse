@@ -1,12 +1,16 @@
 import type { CustomerId } from "./customer";
+import type { IngredientId } from "./ingredient";
 
 export type OrderId = string;
 export type Order = {
 	id: OrderId;
 	name: string;
 	description?: string[];
-	customerId: CustomerId;
-	targetColor: string;
+	customer: {
+		id: CustomerId;
+		pose?: string;
+	};
+	requiredIngredients: IngredientId[];
 	/** How much the customer will pay for this */
 	value: number;
 };

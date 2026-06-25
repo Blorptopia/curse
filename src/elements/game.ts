@@ -28,6 +28,7 @@ import { Task } from "@lit/task";
 import type { PlaceIngredientData, PlaceItemData } from "../types/place";
 import { ConicalFlaskBaseElement } from "./flask/conical";
 import { IngredientIconElement } from "./ingredient_icon";
+import { ifDefined } from "lit/directives/if-defined.js";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 
@@ -302,7 +303,7 @@ export class GameElement extends LitElement {
 				<div id="right-window" class="window"></div>
 
 				${this.orders.length === 0 ? this.renderCustomer(this.dayIndex === 0 ? "LOANS_HARK_PRE_EXPLOSION" : "LOANS_HARK", 0) : null}
-				${map(this.orders, (order, index) => this.renderCustomer(order.customerId, index))}
+				${map(this.orders, (order, index) => this.renderCustomer(order.customer.id, order.customer.pose, index))}
 				${this.renderDialog()}
 				<div id="entities-container"></div>
 				<div id="hot-plate-container">
@@ -409,7 +410,7 @@ export class GameElement extends LitElement {
 		`
 
 	}
-	private renderCustomer(customerId: CustomerId, orderIndex: number): HTMLTemplateResult {
+	private renderCustomer(customerId: CustomerId, pose: string | undefined, orderIndex: number): HTMLTemplateResult {
 		if (orderIndex > 4) {
 			return html``;
 		}
@@ -421,6 +422,7 @@ export class GameElement extends LitElement {
 				${orderIndex === 0 ? html`
 					<curse-customer-portrait
 						customerid=${customerId}
+						pose=${ifDefined(pose)}
 					></curse-customer-portrait>
 				` : html`
 					<curse-customer-shadow
@@ -442,7 +444,7 @@ export class GameElement extends LitElement {
 			return html`
 				<div id="dialog">
 					<div id="dialog-heading">
-						<h1>${CUSTOMER_ID_TO_NAME[activeOrder.customerId]}</h1>
+						<h1>${CUSTOMER_ID_TO_NAME[activeOrder.customer.id]}</h1>
 						<div id="target-color" style=${styleMap({backgroundColor: activeOrder.targetColor})}></div>
 					</div>
 					<p>${currentDialogPage}</p>
@@ -478,7 +480,7 @@ export class GameElement extends LitElement {
 			return html`
 				<div id="dialog">
 					<div id="dialog-heading">
-						<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK_PRE_EXPLOSION"]}</h1>
+						<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK"]}</h1>
 						<div id="target-color" style=${styleMap({backgroundColor: "#f00"})}></div>
 					</div>
 					<p>Dialoge here</p>
@@ -489,7 +491,7 @@ export class GameElement extends LitElement {
 		return html`
 			<div id="dialog">
 				<div id="dialog-heading">
-					<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK_PRE_EXPLOSION"]}</h1>
+					<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK"]}</h1>
 					<div id="target-color" style=${styleMap({backgroundColor: "#f00"})}></div>
 				</div>
 				<p>I'm here for my daily payment of <span class="price">${payment}</span></p>
@@ -505,22 +507,28 @@ export class GameElement extends LitElement {
 			{
 				name: "Genius potion",
 				description: ["My wife keeps winning at trivia and maths, please make me a genius potion."],
-				customerId: "JACK",
-				targetColor: "#00FF00",
+				customer: {
+					id: "JACK",
+				},
+				requiredIngredients: ["BURGER"],
 				baseValue: 1
 			},
 			{
 				name: "Stupid potion",
 				description: ["I never lose to my wife anymore, but somehow, i learned to speak dog. All my dog does is argue politics with me now. Please make me a stupid potion."],
-				customerId: "JACK",
-				targetColor: "#00FFFF",
+				customer: {
+					id: "JACK",
+				},
+				requiredIngredients: ["BURGER"],
 				baseValue: 1
 			},
 			{
 				name: "Antidepressant potion",
 				description: ["Now that i'm stupid, both my dog and wife keep beating me at everything.\nI still speak dog.\nPlease make me an anti-depression potion."],
-				customerId: "JACK",
-				targetColor: "#00FFFF",
+				customer: {
+					id: "JACK",
+				},
+				requiredIngredients: ["BURGER"],
 				baseValue: 1
 			},
 
@@ -532,8 +540,10 @@ export class GameElement extends LitElement {
 					"Hey I could need some help",
 					"I need some confidence for this job interview, could you help me out?"
 				],
-				customerId: "JOANY",
-				targetColor: "#FFFF00",
+				customer: {
+					id: "JOANY",
+				},
+				requiredIngredients: ["BURGER"],
 				baseValue: 1
 			},
 		];
@@ -552,14 +562,18 @@ export class GameElement extends LitElement {
 		const RANDOM_ORDER_TEMPLATES: OrderTemplate[] = [
 			{
 				name: "Armor potion",
-				customerId: "JACK",
-				targetColor: "#00FFFF",
+				customer: {
+					id: "JACK",
+				},
+				requiredIngredients: ["BURGER"],
 				baseValue: 1
 			},
 			{
 				name: "Upside-down potion",
-				customerId: "JACK",
-				targetColor: "#00FFFF",
+				customer: {
+					id: "JACK",
+				},
+				requiredIngredients: ["BURGER"],
 				baseValue: 1
 			},
 		];
@@ -584,8 +598,8 @@ export class GameElement extends LitElement {
 				id: crypto.randomUUID(),
 				name: template.name,
 				description: template.description,
-				customerId: template.customerId,
-				targetColor: template.targetColor,
+				customer: template.customer,
+				requiredIngredients: template.requiredIngredients,
 				value
 			} satisfies Order;
 			return order;
