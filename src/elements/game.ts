@@ -445,7 +445,6 @@ export class GameElement extends LitElement {
 				<div id="dialog">
 					<div id="dialog-heading">
 						<h1>${CUSTOMER_ID_TO_NAME[activeOrder.customer.id]}</h1>
-						<div id="target-color" style=${styleMap({backgroundColor: activeOrder.targetColor})}></div>
 					</div>
 					<p>${currentDialogPage}</p>
 
@@ -481,7 +480,6 @@ export class GameElement extends LitElement {
 				<div id="dialog">
 					<div id="dialog-heading">
 						<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK"]}</h1>
-						<div id="target-color" style=${styleMap({backgroundColor: "#f00"})}></div>
 					</div>
 					<p>Dialoge here</p>
 				</div>
@@ -492,7 +490,6 @@ export class GameElement extends LitElement {
 			<div id="dialog">
 				<div id="dialog-heading">
 					<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK"]}</h1>
-					<div id="target-color" style=${styleMap({backgroundColor: "#f00"})}></div>
 				</div>
 				<p>I'm here for my daily payment of <span class="price">${payment}</span></p>
 				<div id="actions">
@@ -948,12 +945,6 @@ export class GameElement extends LitElement {
 			h1 {
 				margin: 0;
 				vertical-align: middle;
-			}
-			#target-color {
-				--size: 1.75rem;
-				height: var(--size);
-				width: var(--size);
-				border-radius: 50%;
 			}
 			user-select: none;
 		}
