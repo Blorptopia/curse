@@ -63,7 +63,7 @@ const WORM: IngredientInfo = {
 		}
 	},
 	price: 50,
-	color: Color("#ae3ed1"),
+	color: Color("#fdadd4"),
 };
 const NIGHTSHADE: IngredientInfo = {
 	name: "Nightshade",
@@ -74,7 +74,7 @@ const NIGHTSHADE: IngredientInfo = {
 		}
 	},
 	price: 50,
-	color: Color("#ae3ed1"),
+	color: Color("#524167"),
 };
 const MELOTONIN: IngredientInfo = {
 	name: "MELOTONIN",
@@ -85,7 +85,7 @@ const MELOTONIN: IngredientInfo = {
 		}
 	},
 	price: 50,
-	color: Color("#ae3ed1"),
+	color: Color("#bfbac1"),
 };
 const LYTTA: IngredientInfo = {
 	name: "Lytta Vesicatoria",
@@ -96,7 +96,7 @@ const LYTTA: IngredientInfo = {
 		}
 	},
 	price: 50,
-	color: Color("#ae3ed1"),
+	color: Color("#a5a881"),
 };
 const MANDRAKE: IngredientInfo = {
 	name: "Mandrake",
@@ -107,7 +107,7 @@ const MANDRAKE: IngredientInfo = {
 		}
 	},
 	price: 50,
-	color: Color("#ae3ed1"),
+	color: Color("#584f49"),
 };
 const UNICORN_HORN: IngredientInfo = {
 	name: "Unicorn horn",
@@ -118,7 +118,7 @@ const UNICORN_HORN: IngredientInfo = {
 		}
 	},
 	price: 50,
-	color: Color("#ae3ed1"),
+	color: Color("#ece0ae"),
 };
 export const INGREDIENTS = {
 	BURGER,
