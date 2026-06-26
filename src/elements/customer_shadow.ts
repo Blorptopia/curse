@@ -3,15 +3,14 @@ import { customElement, property } from "lit/decorators.js";
 import type { CustomerId } from "../types/customer";
 
 import JackShadowURL from "../assets/customers/jack/shadow.png";
-// import JoanyShadowURL from "../assets/customers/joany/shadow.png";
+import JoanyShadowURL from "../assets/customers/joany/shadow.png";
 import TimTomShadowURL from "../assets/customers/tim_tom/shadow.png";
 import OleMartinssonShadowURL from "../assets/customers/ole_martinsson/shadow.png";
 import WhichyVequliaShadowURL from "../assets/customers/whicky_vequlia/shadow.png";
 
 const ID_TO_IMAGES = {
 	JACK: JackShadowURL,
-	// JOANY: JoanyShadowURL,
-	JOANY: "",
+	JOANY: JoanyShadowURL,
 	TIM_TOM: TimTomShadowURL,
 	LOANS_HARK: "",
 	OLE_MARTINSSON: OleMartinssonShadowURL,
