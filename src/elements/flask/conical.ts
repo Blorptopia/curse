@@ -9,7 +9,7 @@ import MaskImageURL from "../../assets/flask/conical/mask.png?url";
 import { INGREDIENTS } from "../../data/ingredients";
 import { hotPlateActivatedContext } from "../../lib/context";
 import { consume } from "@lit/context";
-import { FLASK_BASELINE_TEMPERATURE } from "../../config";
+import { FLASK_BASELINE_TEMPERATURE, FLASK_HEAT_SPEED, FLASK_MAX_OVERHEAT_SCORE, FLASK_MAX_TEMPERATURE } from "../../config";
 
 
 @customElement("curse-conical-flask")
@@ -100,6 +100,31 @@ export class ConicalFlaskBaseElement extends LitElement {
 
 					const event = new CustomEvent("cursetemperaturechange");
 					this.dispatchEvent(event);
+
+					this.mutateInstances(instance => {
+						let heatedFraction = instance.heatedFraction;
+						const heatEffect = (this.temperature - FLASK_BASELINE_TEMPERATURE) / FLASK_MAX_TEMPERATURE;
+						heatedFraction += heatEffect * FLASK_HEAT_SPEED;
+
+						let wronglyHeatedScore = instance.wronglyHeatedScore;
+						const ingredient = INGREDIENTS[instance.ingredientId];
+						const minTemp = ingredient.effects?.tempratureRange?.min;
+						if (minTemp !== undefined && this.temperature < minTemp) {
+							wronglyHeatedScore++;
+						}
+						const maxTemp = ingredient.effects?.tempratureRange?.max;
+						if (maxTemp !== undefined && this.temperature > maxTemp) {
+							wronglyHeatedScore++;
+						}
+
+						console.log({wronglyHeatedScore, heatedFraction});
+
+						return {
+							...instance,
+							heatedFraction,
+							wronglyHeatedScore
+						}
+					});
 				}
 			},
 			args: () => [this.disabled] as const
@@ -170,7 +195,8 @@ export class ConicalFlaskBaseElement extends LitElement {
 				poisonFraction: 0,
 				heatedFraction: 0,
 				spinsFromStart: 0,
-				totalRotation: 0
+				totalRotation: 0,
+				wronglyHeatedScore: 0
 		} satisfies IngredientInstance;
 		const instanceId = crypto.randomUUID();
 		this.instances = {
@@ -290,20 +316,25 @@ export class ConicalFlaskBaseElement extends LitElement {
 
 			// Dual sided
 			let heatMultiplier = 1;
-			if (instance.heatedFraction > 1) {
-				heatMultiplier -= Math.max(2, instance.heatedFraction);
+			if (instance.heatedFraction >= 1) {
+				heatMultiplier -= 1 - Math.max(2, instance.heatedFraction);
 			} else {
-				heatMultiplier -= 1 - instance.heatedFraction;
+				heatMultiplier = instance.heatedFraction;
 			}
 			instanceValue += ingredient.price * heatMultiplier;
 
 			// Negative effects
 			instanceValue -= instanceValue * 2 * instance.poisonFraction;
+			console.log({instanceValue, heatMultiplier});
 			
+			const wronglyHeatedFraction = Math.min(instance.wronglyHeatedScore, FLASK_MAX_OVERHEAT_SCORE) / FLASK_MAX_OVERHEAT_SCORE;
+			instanceValue -= wronglyHeatedFraction * ingredient.price * 0.5;
 			value += instanceValue;
 		}
 
 		this.instances = {};
+
+		console.log({value});
 
 		return value;
 	}

@@ -366,7 +366,7 @@ export class GameElement extends LitElement {
 				</div>
 			</div>
 			<section id="shelf">
-				<div id="balance">${this.balance}$</div>
+				<div id="balance">${Math.floor(this.balance)}$</div>
 				<div id="items-row" class="shelf-row">
 					${map(Object.keys(ITEMS) as ItemId[], itemId => this.renderItemListing(itemId))}
 				</div>
@@ -539,7 +539,7 @@ export class GameElement extends LitElement {
 					`;
 				} else {
 					contentFragment = html`
-						<p>What did you just give me? I don't feel so good.</p>
+						<p>Thank you!</p>
 
 						<div id="actions">
 							<button
@@ -549,7 +549,7 @@ export class GameElement extends LitElement {
 									this.valueFromPotion = undefined;
 									this.orders = this.orders.slice(1);
 								}}
-							>Next customer</button>
+							>Take ${Math.floor(this.valueFromPotion)}$</button>
 						</div>
 					`;
 				}

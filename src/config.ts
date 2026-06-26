@@ -15,3 +15,5 @@ export const PHYSICS_DEBUG_RES: number = 500;
 export const STAND_HEIGHT_METERS = 1.5;
 export const FLASK_BASELINE_TEMPERATURE = 20;
 export const FLASK_MAX_TEMPERATURE = 100;
+export const FLASK_HEAT_SPEED = 0.05;
+export const FLASK_MAX_OVERHEAT_SCORE = 40;
