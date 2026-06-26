@@ -92,8 +92,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 					return;
 				}
 				while (!signal.aborted) {
-
-					if (this.onHotPlate) {
+					if (this.onHotPlate && this.hotPlateActivated) {
 						await new Promise<void>(resolve => setTimeout(resolve, 300));
 						this.temperature += 3;
 					} else {

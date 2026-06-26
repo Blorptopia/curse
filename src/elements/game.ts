@@ -17,8 +17,8 @@ import { INGREDIENTS } from "../data/ingredients";
 import type { IngredientId } from "../types/ingredient";
 import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
-import { consume } from "@lit/context";
-import { physicsContext, type PhysicsContext } from "../lib/context";
+import { consume, provide } from "@lit/context";
+import { hotPlateActivatedContext, physicsContext, type PhysicsContext } from "../lib/context";
 import { type ImpulseJoint, type RigidBody, type Collider, Vector2, TempContactForceEvent } from "@dimforge/rapier2d-compat";
 import { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
@@ -36,7 +36,11 @@ const RANDOM_VALUE_VARIATION: number = 0.1;
 export class GameElement extends LitElement {
 	// Props
 	@consume({context: physicsContext, subscribe: true})
+	@property({type: Object})
 	public physics?: PhysicsContext;
+	@provide({ context: hotPlateActivatedContext })
+	@property({type: Object})
+	public hotPlateActive: boolean;
 	// State
 	@state()
 	private dayIndex: number;
@@ -53,7 +57,7 @@ export class GameElement extends LitElement {
 	@state()
 	private flasksOnHotPlate: string[];
 	@state()
-	private flaskTempratures: Partial<Record<string, string>>;
+	private flaskTemperatures: Partial<Record<string, string>>;
 
 	// Attributes
 	private constantRigidBodies: RigidBody[];
@@ -71,6 +75,8 @@ export class GameElement extends LitElement {
 	public constructor() {
 		super();
 
+		this.hotPlateActive = false;
+
 		this.dayIndex = 0;
 		this.deadCustomerIds = [];
 		this.orders = this.createOrders();
@@ -78,7 +84,7 @@ export class GameElement extends LitElement {
 		this.productPurchaseCount = {};
 		this.balance = 500;
 		this.flasksOnHotPlate = [];
-		this.flaskTempratures = {};
+		this.flaskTemperatures = {};
 		
 		this.constantRigidBodies = [];
 		this.entities = {};
@@ -185,8 +191,8 @@ export class GameElement extends LitElement {
 							visualElement.shouldBeDraggable = false;
 
 							visualElement.addEventListener("cursetemperaturechange", () => {
-								this.flaskTempratures = {
-									...this.flaskTempratures,
+								this.flaskTemperatures = {
+									...this.flaskTemperatures,
 									[entityId]: visualElement!.temperature
 								}
 							});
@@ -320,7 +326,11 @@ export class GameElement extends LitElement {
 				${this.renderDialog()}
 				<div id="entities-container"></div>
 				<div id="hot-plate-container">
-					<curse-hot-plate></curse-hot-plate>
+					<curse-hot-plate
+						.temperatures=${this.flasksOnHotPlate.map(entityId => this.flaskTemperatures[entityId])}
+						@curseenablehotplate=${() => this.hotPlateActive = true}
+						@cursedisablehotplate=${() => this.hotPlateActive = false}
+					></curse-hot-plate>
 				</div>
 			</div>
 			<section id="shelf">
@@ -708,8 +718,6 @@ export class GameElement extends LitElement {
 		
 	}
 	public handleCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
-		console.log("game got collision event");
-		
 		this.handlePlaceItemCollisionEvent(collider1, collider2, started);
 		this.handleHotPlateCollisionEvent(collider1, collider2, started);
 
@@ -823,6 +831,7 @@ export class GameElement extends LitElement {
 				return;
 			}
 			if (started) {
+				this.flasksOnHotPlate = this.flasksOnHotPlate.filter(id => id !== entity1Id);
 				this.flasksOnHotPlate.push(entity1Id);
 			} else {
 				this.flasksOnHotPlate = this.flasksOnHotPlate.filter(id => id !== entity1Id);
@@ -836,6 +845,7 @@ export class GameElement extends LitElement {
 			}
 			entity2.element.onHotPlate = started;
 			if (started) {
+				this.flasksOnHotPlate = this.flasksOnHotPlate.filter(id => id !== entity2Id);
 				this.flasksOnHotPlate.push(entity2Id);
 			} else {
 				this.flasksOnHotPlate = this.flasksOnHotPlate.filter(id => id !== entity2Id);

@@ -58,7 +58,6 @@ export class PhysicsWorldElement extends LitElement {
 				while (!signal.aborted) {
 					physicsContext.world.step(eventQueue);
 					eventQueue.drainCollisionEvents((handle1, handle2, started) => {
-						console.log("got physics event");
 						const collider1 = physicsContext.world.getCollider(handle1);
 						const collider2 = physicsContext.world.getCollider(handle2);
 						if (this.gameElement !== undefined && this.gameElement !== null) {

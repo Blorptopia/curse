@@ -1,5 +1,5 @@
 import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import HotPlateURL from "../assets/hot_plate/base.png";
 import HotPlateUnpressedButtonURL from "../assets/hot_plate/button/unpressed.png";
 import HotPlatePressedButtonURL from "../assets/hot_plate/button/pressed.png";
@@ -11,6 +11,7 @@ import ReleaseAudio2URL from "../assets/hot_plate/button/release/2.wav";
 import ReleaseAudio3URL from "../assets/hot_plate/button/release/3.wav";
 import FireAudioURL from "../assets/hot_plate/fire.mp3";
 import { IGNITION_OFFSET_MS } from "../config";
+import { repeat } from "lit/directives/repeat.js";
 
 const PRESS_AUDIO_URLS: string[] = [
 	PressAudio1URL,
@@ -25,6 +26,11 @@ const RELEASE_AUDIO_URLS: string[] = [
 
 @customElement("curse-hot-plate")
 export class HotPlateElement extends LitElement {
+	// Props
+	@property({type: Array})
+	public temperatures: number[];
+
+	// State
 	@state()
 	private state: HotPlateState;
 	@state()
@@ -37,6 +43,8 @@ export class HotPlateElement extends LitElement {
 
 	public constructor() {
 		super();
+		this.temperatures = [];
+
 		this.state = "unpressed";
 		this.desiredToBePressed = false;
 
@@ -65,6 +73,10 @@ export class HotPlateElement extends LitElement {
 				src=${["activating", "pressed"].includes(this.state) ? HotPlatePressedButtonURL : HotPlateUnpressedButtonURL}
 				alt
 			>
+			<div id="temperatures-container">
+				${repeat(this.temperatures, temperature => temperature, temperature => html`
+					<span class="temperature" ?data-high=${temperature > 90}>${temperature} &deg;C</span>
+				`)}
 		`; 
 	}
 	private humanPress(): void {
@@ -127,6 +139,14 @@ export class HotPlateElement extends LitElement {
 			this.fireAudio.pause();
 			this.fireAudio.fastSeek(Math.random() * 5);
 		}
+		if (this.state === "pressed") {
+			const event = new CustomEvent("curseenablehotplate");
+			this.dispatchEvent(event);
+		}
+		if (from === "pressed") {
+			const event = new CustomEvent("cursedisablehotplate");
+			this.dispatchEvent(event);
+		}
 
 	}
 	public static styles?: CSSResultGroup = css`
@@ -159,6 +179,28 @@ export class HotPlateElement extends LitElement {
 			top: 0;
 			left: 0;
 			pointer-events: none;
+		}
+		#temperatures-container {
+			position: absolute;
+			top: 0;
+			left: 0;
+			box-sizing: border-box;
+			width: 50%;
+			height: 100%;
+			overflow: hidden;
+			font-size: 1.3rem;
+			padding: 1rem;
+
+			display: flex;
+			align-items: center;
+			gap: .5rem;
+
+		}
+		.temperature {
+			background: #5c1361;
+		}
+		.temperature[data-high] {
+			color: red;
 		}
 	`
 }
