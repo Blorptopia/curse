@@ -97,7 +97,6 @@ export class ConicalFlaskBaseElement extends LitElement {
 						this.temperature -= 1;
 					}
 					this.temperature = Math.max(FLASK_BASELINE_TEMPERATURE, this.temperature);
-					console.log(`set temperature to ${this.temperature}`);
 
 					const event = new CustomEvent("cursetemperaturechange");
 					this.dispatchEvent(event);
@@ -270,9 +269,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 				continue;
 			}
 
-			const ingredient = INGREDIENTS[instance.ingredientId];
-
-			const liquidScale = canvasHeight / this.maxLiquid
+			const liquidScale = canvasHeight / this.maxLiquid;
 
 			const height = canvasHeight + liquidScale * (ingredientIndex + 1) - liquidScale * instances.length;
 
@@ -348,7 +345,20 @@ export class ConicalFlaskBaseElement extends LitElement {
 
 		// Make more transparent depending on how little it's cooked
 		const transparent = new Color("transparent");
-		color = ingredient.color.mix(transparent, 1 - Math.max(0.2, Math.min(1, instance.heatedFraction)));
+		color = color.mix(transparent, 1 - Math.max(0.2, Math.min(1, instance.heatedFraction)));
+		
+		if (instance.heatedFraction > 1) {
+			const brown = new Color("brown");
+			color = color.mix(brown, Math.min(1, instance.heatedFraction - 1));
+		}
+
+
+		const black = new Color("black");
+		const wronglyHeatedFraction = Math.min(instance.wronglyHeatedScore, FLASK_MAX_OVERHEAT_SCORE) / FLASK_MAX_OVERHEAT_SCORE;
+		color = color.mix(black, wronglyHeatedFraction / 2);
+
+		const purple = new Color("#ae3ed1");
+		color = color.mix(purple, instance.poisonFraction / 2);
 
 		return color;
 		
