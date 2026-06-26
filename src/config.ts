@@ -17,3 +17,4 @@ export const FLASK_BASELINE_TEMPERATURE = 20;
 export const FLASK_MAX_TEMPERATURE = 100;
 export const FLASK_HEAT_SPEED = 0.05;
 export const FLASK_MAX_OVERHEAT_SCORE = 40;
+export const FLASK_REQUIRED_ROTATION: number = 10 * 2 * Math.PI;

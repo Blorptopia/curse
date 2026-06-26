@@ -9,7 +9,7 @@ import MaskImageURL from "../../assets/flask/conical/mask.png?url";
 import { INGREDIENTS } from "../../data/ingredients";
 import { hotPlateActivatedContext } from "../../lib/context";
 import { consume } from "@lit/context";
-import { FLASK_BASELINE_TEMPERATURE, FLASK_HEAT_SPEED, FLASK_MAX_OVERHEAT_SCORE, FLASK_MAX_TEMPERATURE } from "../../config";
+import { FLASK_BASELINE_TEMPERATURE, FLASK_HEAT_SPEED, FLASK_MAX_OVERHEAT_SCORE, FLASK_MAX_TEMPERATURE, FLASK_REQUIRED_ROTATION } from "../../config";
 import Color, { type ColorInstance } from "color";
 
 
@@ -208,29 +208,19 @@ export class ConicalFlaskBaseElement extends LitElement {
 	    super.willUpdate(changedProperties);
 
 		const oldAngleRad = changedProperties.get("angleRad") as number | undefined;
-		// console.log({oldAngleRad, angleRad: this.angleRad});
-
-		// This is broken. @platinumaniac pls fix kthx
-		// if (oldAngleRad !== undefined) {
-		// 	if (oldAngleRad > 0 && this.angleRad < 0) {
-		// 		console.log("mutating - spun left");
-		// 		this.mutateInstances(instance => {
-		// 			return {
-		// 				...instance,
-		// 				spinsFromStart: instance.spinsFromStart - 1
-		// 			}
-		// 		})
-		// 	}
-		// 	if (oldAngleRad < 0 && this.angleRad > 0) {
-		// 		console.log("mutating - spun right");
-		// 		this.mutateInstances(instance => {
-		// 			return {
-		// 				...instance,
-		// 				spinsFromStart: instance.spinsFromStart + 1
-		// 			}
-		// 		})
-		// 	}
-		// }
+		if (oldAngleRad === undefined) {
+			return;
+		}
+		let deltaRad = Math.abs(oldAngleRad - this.angleRad);
+		if (deltaRad > Math.PI) {
+			deltaRad = Math.abs(deltaRad - 2*Math.PI);
+		}
+		this.mutateInstances(instance => {
+			return {
+				...instance,
+				totalRotation: instance.totalRotation + deltaRad
+			};
+		});
 	}
 	private mutateInstances(mutator: (instance: IngredientInstance) => IngredientInstance): void {
 		for (const [instanceId, instance] of Object.entries(this.instances)) {
@@ -359,6 +349,10 @@ export class ConicalFlaskBaseElement extends LitElement {
 
 		const purple = new Color("#ae3ed1");
 		color = color.mix(purple, instance.poisonFraction / 2);
+		
+		const mixedFraction = Math.min(instance.totalRotation / FLASK_REQUIRED_ROTATION, 1);
+		color = color.desaturate(1 - mixedFraction);
+		console.log({mixedFraction});
 
 		return color;
 		
