@@ -9,7 +9,7 @@ import "./flask/conical";
 import "./physics_world";
 import { map } from "lit/directives/map.js";
 import type { Order, OrderTemplate } from "../types/order";
-import { MAX_ORDERS_PER_DAY, STAND_HEIGHT_METERS, FLASK_BASELINE_TEMPERATURE, FLASK_MAX_TEMPERATURE } from "../config";
+import { STAND_HEIGHT_METERS, FLASK_BASELINE_TEMPERATURE, FLASK_MAX_TEMPERATURE, ORDERS_PER_DAY } from "../config";
 import type { CustomerId } from "../types/customer";
 import { styleMap } from "lit/directives/style-map.js";
 import { CUSTOMER_ID_TO_NAME } from "../data/customer";
@@ -684,213 +684,235 @@ export class GameElement extends LitElement {
 	}
 	private createOrderTemplates(): OrderTemplate[] {
 		const LORE_MULTIPLIER = 1.1;
-		const JACK_INTERACTIONS: OrderTemplate[] = [
+		const ORDER_TEMPLATES: OrderTemplate[][] = [
 			// Day 1
-			{
-				description: ["My wife keeps winning at trivia and maths, please make me a genius potion."],
-				customer: {
-					id: "JACK",
+			[
+				{
+					description: [
+						"BOOOOO!! HAHAH!! YOU LOOKED SO SCARED!! DON’T MIND THE CAMERAS. THEY’RE FOR MY PROTECTION",
+						"DO YOU HAVE THE Burger Potion AT THIS STORE?"
+					],
+					customer: {
+						id: "TIM_TOM"
+					},
+					requiredIngredients: ["BURGER"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["BURGER"],
-				baseValue: LORE_MULTIPLIER
-			},
+				{
+					description: [
+						"Hello there adult! I want ONE energy drink ultra extreme potion. To ONE man!",
+					],
+					customer: {
+						id: "OLE_MARTINSSON"
+					},
+					requiredIngredients: ["EGG"],
+					baseValue: LORE_MULTIPLIER
+				},
+				{
+					description: [
+						"Well, hey there Sweetie. Please don’t say you stick your boggers on the walls of this hotdog van.",
+						"Well enough about you wizard boy. I want a potion that makes my wrinkles on my face go away so I don’t look like Scooby doo."
+					],
+					customer: {
+						id: "WHICKY_VEQUILIA"
+					},
+					requiredIngredients: ["CRAB", "EGG"],
+					baseValue: LORE_MULTIPLIER
+				},
+				{
+					description: [
+						"HEY THERE FRIEND! WE ARE FRINEDS RIGHT?!",
+						"SAY THAT YOU HATE WOMEN!!",
+						"WHAT I WANT!? I WANT A 67 TUNG TUNG DRINK POTION!"
+					],
+					customer: {
+						id: "TIM_TOM"
+					},
+					requiredIngredients: ["BURGER", "EGG"],
+					baseValue: LORE_MULTIPLIER
+				},
+				{
+					description: [
+						"My neighbor’s flower garden is beautiful, and smells of heaven.",
+						"Brew me a Weed-Killer Potion."
+					],
+					customer: {
+						id: "WHICKY_VEQUILIA"
+					},
+					requiredIngredients: ["BEAST_ENERGY", "FLAT_BURGER"],
+					baseValue: LORE_MULTIPLIER
+				},
+			],
 			// Day 2
-			{
-				description: ["I never lose to my wife anymore, but somehow, i learned to speak dog. All my dog does is argue politics with me now. Please make me a stupid potion."],
-				customer: {
-					id: "JACK",
+			[
+				{
+					description: ["My wife keeps winning at trivia and maths, please make me a genius potion."],
+					customer: {
+						id: "JACK",
+					},
+					requiredIngredients: ["BURGER"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["BURGER"],
-				baseValue: LORE_MULTIPLIER
-			},
+				{
+					description: [
+						"Oh heavens! Are you able to cast a spell to fix that awful mask you’re wearing?",
+						"Oh? It’s just your face? Well…you should probably start using a mask then.",
+						"Enough chit-chat. I want a Cat parfyme to my 101 cats. They are constantly walking around, smelling like tuna and ass."
+					],
+					customer: {
+						id: "WHICKY_VEQUILIA"
+					},
+					requiredIngredients: ["CRAB", "EGG"],
+					baseValue: LORE_MULTIPLIER
+				},
+				{
+					description: [
+						"I will be remembered by people who have never met me",
+						"Do you have a Stinky Potion for me?"
+					],
+					customer: {
+						id: "JON_JODUN"
+					},
+					requiredIngredients: ["FLAT_BURGER", "CRAB"],
+					baseValue: LORE_MULTIPLIER
+				},
+				{
+					description: [
+						"Great weather we are having adult! I just came from work and gave a kiss to my beautiful wife! Could I get ONE fly potion. To ONE man?",
+					],
+					customer: {
+						id: "OLE_MARTINSSON"
+					},
+					requiredIngredients: ["EGG", "FLYING_OINTMENT"],
+					baseValue: LORE_MULTIPLIER
+				},
+				{
+					description: ["I never lose to my wife anymore, but somehow, i learned to speak dog. All my dog does is argue politics with me now. Please make me a stupid potion."],
+					customer: {
+						id: "JACK",
+					},
+					requiredIngredients: ["UNICORN_HORN"],
+					baseValue: LORE_MULTIPLIER
+				},
+				{
+					description: [
+						"HELLO FRIEND! WE ARE BEST FRIENDS RIGHT???",
+						"What? No I am not recording you!",
+						"But if I was. Would you ask everyone to go follow TimTomLegendBeast on TikTok?",
+						"COULD I ALSO GET A POTION TO BE THE MOST ANNOYING PERSON ON EARTH??",
+					],
+					customer: {
+						id: "TIM_TOM"
+					},
+					requiredIngredients: ["CRAB", "EGG"],
+					baseValue: LORE_MULTIPLIER
+				},
+			],
 			// Day 3
-			{
-				description: ["Now that i'm stupid, both my dog and wife keep beating me at everything.\nI still speak dog.\nPlease make me an anti-depression potion."],
-				customer: {
-					id: "JACK",
+			[
+				{
+					description: ["Now that i'm stupid, both my dog and wife keep beating me at everything.\nI still speak dog.\nPlease make me an anti-depression potion."],
+					customer: {
+						id: "JACK",
+					},
+					requiredIngredients: ["BURGER"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["BURGER"],
-				baseValue: LORE_MULTIPLIER
-			},
-
-		];
-		const JOANY_INTERACTIONS: OrderTemplate[] = [
-			// Day 2
-			{
-				description: [
-					"Hey I could need some help",
-					"I need some confidence for this job interview, could you help me out?"
-				],
-				customer: {
-					id: "JOANY",
+				{
+					description: [
+						"THAT GUY BEHIND ME LIKES YOU!!",
+						"HAHAHAhaha…ha…",
+						html`btw….could I get..<span class="small">uh…a potion that makes..uh..tiny things grow longer</span>`,
+						html`<span class="small">COULD I ALSO GET A POTION TO BE THE MOST ANNOYING PERSON ON EARTH??</span>`
+					],
+					customer: {
+						id: "TIM_TOM"
+					},
+					requiredIngredients: ["CRAB", "EGG"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["BURGER"],
-				baseValue: LORE_MULTIPLIER
-			},
-		];
-		const WHICKY_INTERACTIONS: OrderTemplate[] = [
-			// Day 3
-			{
-				description: [
-					"Well, hey there Sweetie. Please don’t say you stick your boggers on the walls of this hotdog van.",
-					"Well enough about you wizard boy. I want a potion that makes my wrinkles on my face go away so I don’t look like Scooby doo."
-				],
-				customer: {
-					id: "WHICKY_VEQUILIA"
+				{
+					description: [
+						"They thought I was gone. Little do they know I can breathe dirt",
+						"Do you have an Evil Potion for me?"
+					],
+					customer: {
+						id: "JON_JODUN"
+					},
+					requiredIngredients: ["MELOTONIN", "CRAB"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["CRAB", "EGG"],
-				baseValue: LORE_MULTIPLIER
-			},
-			// Day 5
-			{
-				description: [
-					"Oh heavens! Are you able to cast a spell to fix that awful mask you’re wearing?",
-					"Oh? It’s just your face? Well…you should probably start using a mask then.",
-					"Enough chit-chat. I want a Cat parfyme to my 101 cats. They are constantly walking around, smelling like tuna and ass."
-				],
-				customer: {
-					id: "WHICKY_VEQUILIA"
+				{
+					description: [
+						"I’m going to Vegas next week",
+						"Brew me a Luck potion"
+					],
+					customer: {
+						id: "WHICKY_VEQUILIA"
+					},
+					requiredIngredients: ["NIGHTSHADE", "MONKEY_BRAIN"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["CRAB", "EGG"],
-				baseValue: LORE_MULTIPLIER
-			}
-		];
-		const TIM_TOM_INTERACTIONS: OrderTemplate[] = [
-			// Day 1
-			{
-				description: [
-					"HEY THERE FRIEND! WE ARE FRINEDS RIGHT?!",
-					"SAY THAT YOU HATE WOMEN!!",
-					"WHAT I WANT!? I WANT A 67 TUNG TUNG DRINK POTION!"
-				],
-				customer: {
-					id: "TIM_TOM"
-				},
-				requiredIngredients: ["CRAB", "EGG"],
-				baseValue: LORE_MULTIPLIER
-			},
-			// Day 2
-			{
-				description: [
-					"HELLO FRIEND! WE ARE BEST FRIENDS RIGHT???",
-					"What? No I am not recording you!",
-					"But if I was. Would you ask everyone to go follow TimTomLegendBeast on TikTok?",
-					"COULD I ALSO GET A POTION TO BE THE MOST ANNOYING PERSON ON EARTH??",
-				],
-				customer: {
-					id: "TIM_TOM"
-				},
-				requiredIngredients: ["CRAB", "EGG"],
-				baseValue: LORE_MULTIPLIER
-			},
+			],
 			// Day 4
-			{
-				description: [
-					"My neighbor’s flower garden is beautiful, and smells of heaven.",
-					"Brew me a Weed-Killer Potion."
-				],
-				customer: {
-					id: "WHICKY_VEQUILIA"
+			[
+				{
+					description: [
+						"I hate my kid. There’s a hurricane on the way.",
+						"Brew me a Levitation Potion."
+					],
+					customer: {
+						id: "WHICKY_VEQUILIA",
+					},
+					requiredIngredients: ["CRAB", "EGG"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["CRAB", "EGG"],
-				baseValue: LORE_MULTIPLIER
-			},
-			{
-				description: [
-					"I hate my kid. There’s a hurricane on the way.",
-					"Brew me a Levitation Potion."
-				],
-				customer: {
-					id: "WHICKY_VEQUILIA",
+				{
+					description: [
+						"How was I supposed to know my father was allergic to giraffes?",
+						"Do you have a Non-Allergenic Potion for me?"
+					],
+					customer: {
+						id: "JON_JODUN"
+					},
+					requiredIngredients: ["MANDRAKE", "FLYING_OINTMENT"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["CRAB", "EGG"],
-				baseValue: LORE_MULTIPLIER
-			},
-
-			// Day 3
-			{
-				description: [
-					"THAT GUY BEHIND ME LIKES YOU!!",
-					"HAHAHAhaha…ha…",
-					html`btw….could I get..<span class="small">uh…a potion that makes..uh..tiny things grow longer</span>`,
-					html`<span class="small">COULD I ALSO GET A POTION TO BE THE MOST ANNOYING PERSON ON EARTH??</span>`
-				],
-				customer: {
-					id: "TIM_TOM"
+				{
+					description: [
+						"HI!! WHAT DO YOU THINK ABOUT [CONTROVERSIAL CURRENT EVENT]? SHOULD MUSHROOM PEOPLE BE ALLOWED TO OWN HOMES??",
+						"DO YOU HAVE THE Rizz Potion AT THIS STORE?"
+					],
+					customer: {
+						id: "TIM_TOM"
+					},
+					requiredIngredients: ["UNICORN_HORN", "NIGHTSHADE"],
+					baseValue: LORE_MULTIPLIER
 				},
-				requiredIngredients: ["CRAB", "EGG"],
-				baseValue: LORE_MULTIPLIER
-			},
+				{
+					description: [
+						"YOU CAN ONLY PICK ONE. RIGHTS FOR MUSHROOM PEOPLE, OR ECONOMIC STABILITY",
+						"DO YOU HAVE THE Burger Potion AT THIS STORE?"
+					],
+					customer: {
+						id: "TIM_TOM"
+					},
+					requiredIngredients: ["BURGER", "FLYING_OINTMENT", "UNICORN_HORN"],
+					baseValue: LORE_MULTIPLIER
+				},
+			]
 		];
-		const RONNY_INTERACTIONS: OrderTemplate[] = [
-			// Day 1
-			{
-				description: [
-					"Hello there adult! I want ONE energy drink ultra extreme potion. To ONE man!",
-				],
-				customer: {
-					id: "OLE_MARTINSSON"
-				},
-				requiredIngredients: ["EGG"],
-				baseValue: LORE_MULTIPLIER
-			},
-			// Day 4
-			{
-				description: [
-					"Great weather we are having adult! I just came from work and gave a kiss to my beautiful wife! Could I get ONE fly potion. To ONE man?",
-				],
-				customer: {
-					id: "OLE_MARTINSSON"
-				},
-				requiredIngredients: ["EGG"],
-				baseValue: LORE_MULTIPLIER
+
+		let templates: OrderTemplate[] | undefined = ORDER_TEMPLATES[this.dayIndex];
+		if (templates === undefined) {
+			templates = [];
+			const allTemplates: OrderTemplate[] = [];
+			for (let i = 0; i < ORDERS_PER_DAY; i++) {
+				const template = allTemplates[Math.floor(Math.random() * allTemplates.length)]!;
+				templates.push(template);
 			}
-		];
-		const templates: OrderTemplate[] = [];
-		if (this.dayIndex === 0) {
-			templates.push(RONNY_INTERACTIONS[0]);
-			templates.push(JACK_INTERACTIONS[0]);
-			templates.push(TIM_TOM_INTERACTIONS[0]);
-		}
-		if (this.dayIndex === 1) {
-			templates.push(TIM_TOM_INTERACTIONS[1]);
-			templates.push(JACK_INTERACTIONS[1]);
-			templates.push(JOANY_INTERACTIONS[0]);
-		}
-		if (this.dayIndex === 2) {
-			templates.push(TIM_TOM_INTERACTIONS[2]);
-			templates.push(JACK_INTERACTIONS[2]);
-			templates.push(WHICKY_INTERACTIONS[0]);
-		}
-		if (this.dayIndex === 3) {
-			templates.push(RONNY_INTERACTIONS[1]);
-		}
-		if (this.dayIndex === 5) {
-			templates.push(WHICKY_INTERACTIONS[1]);
 		}
 
-		const RANDOM_ORDER_TEMPLATES: OrderTemplate[] = [
-			{
-				customer: {
-					id: "JACK",
-				},
-				requiredIngredients: ["BURGER"],
-				baseValue: 1
-			},
-			{
-				customer: {
-					id: "JACK",
-				},
-				requiredIngredients: ["BURGER"],
-				baseValue: 1
-			},
-		];
-
-		const desiredRandomOrderCount = MAX_ORDERS_PER_DAY - templates.length;
-		for (let i = 0; i < desiredRandomOrderCount; i++) {
-			const template = RANDOM_ORDER_TEMPLATES[Math.floor(Math.random() * RANDOM_ORDER_TEMPLATES.length)]!;
-			templates.push(template);
-		}
 		return templates;
 	}
 	private createOrders(): Order[] {

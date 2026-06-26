@@ -69,9 +69,6 @@ const NIGHTSHADE: IngredientInfo = {
 	name: "Nightshade",
 	description: "Beautiful woman",
 	effects: {
-		tempratureRange: {
-			max: 30
-		}
 	},
 	price: 50,
 	color: Color("#524167"),
@@ -80,9 +77,6 @@ const MELOTONIN: IngredientInfo = {
 	name: "MELOTONIN",
 	description: "Eeepy pills",
 	effects: {
-		tempratureRange: {
-			max: 30
-		}
 	},
 	price: 50,
 	color: Color("#bfbac1"),
@@ -91,9 +85,6 @@ const LYTTA: IngredientInfo = {
 	name: "Lytta Vesicatoria",
 	description: "Some weird spanish fly",
 	effects: {
-		tempratureRange: {
-			max: 30
-		}
 	},
 	price: 50,
 	color: Color("#a5a881"),
@@ -102,9 +93,6 @@ const MANDRAKE: IngredientInfo = {
 	name: "Mandrake",
 	description: "Screaming baby plant",
 	effects: {
-		tempratureRange: {
-			max: 30
-		}
 	},
 	price: 50,
 	color: Color("#584f49"),
@@ -113,12 +101,33 @@ const UNICORN_HORN: IngredientInfo = {
 	name: "Unicorn horn",
 	description: "Kindly donated by a unicorn startup",
 	effects: {
-		tempratureRange: {
-			max: 30
-		}
 	},
 	price: 50,
 	color: Color("#ece0ae"),
+};
+const MONKEY_BRAIN: IngredientInfo = {
+	name: "Monkey brain",
+	description: "I don't think this was given voluntarily",
+	effects: {
+	},
+	price: 50,
+	color: Color("#f7e1f4"),
+};
+const BEAST_ENERGY: IngredientInfo = {
+	name: "Beast energy",
+	description: "Might not make you fly, but might give some chemical reactions a kick",
+	effects: {
+	},
+	price: 100,
+	color: Color("#8d354a"),
+};
+const FLYING_OINTMENT: IngredientInfo = {
+	name: "Flying ointment",
+	description: "Hopefully the frogs won't find this",
+	effects: {
+	},
+	price: 100,
+	color: Color("#7c4289"),
 };
 export const INGREDIENTS = {
 	BURGER,
@@ -132,4 +141,7 @@ export const INGREDIENTS = {
 	LYTTA,
 	MANDRAKE,
 	UNICORN_HORN,
+	MONKEY_BRAIN,
+	BEAST_ENERGY,
+	FLYING_OINTMENT
 } as const;
