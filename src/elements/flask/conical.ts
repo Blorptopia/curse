@@ -1,5 +1,5 @@
 import { html, type HTMLTemplateResult, LitElement, type CSSResultGroup, css, type PropertyValues } from "lit";
-import { customElement, property, query, state } from "lit/decorators.js";
+import { customElement, property, query } from "lit/decorators.js";
 import FlaskImageURL from "../../assets/flask/conical/image.png";
 import type { PlaceItemData } from "../../types/place";
 import { Task } from "@lit/task";
@@ -10,6 +10,7 @@ import { INGREDIENTS } from "../../data/ingredients";
 import { hotPlateActivatedContext } from "../../lib/context";
 import { consume } from "@lit/context";
 import { FLASK_BASELINE_TEMPERATURE, FLASK_HEAT_SPEED, FLASK_MAX_OVERHEAT_SCORE, FLASK_MAX_TEMPERATURE } from "../../config";
+import Color, { type ColorInstance } from "color";
 
 
 @customElement("curse-conical-flask")
@@ -275,8 +276,10 @@ export class ConicalFlaskBaseElement extends LitElement {
 
 			const height = canvasHeight + liquidScale * (ingredientIndex + 1) - liquidScale * instances.length;
 
+			const colorAfterEffects = this.getInstanceColor(instance);
+
 			if (ingredientIndex === 0) {
-				context.fillStyle = ingredient.color.darken(.2).toString();
+				context.fillStyle = colorAfterEffects.darken(.2).toString();
 				context.beginPath();
 				context.moveTo(0, height);
 				for (let [index, point] of wave.entries()) {
@@ -287,7 +290,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 				context.fill();
 			}
 
-			context.fillStyle = ingredient.color.toString();
+			context.fillStyle = colorAfterEffects.toString();
 			context.beginPath();
 			context.moveTo(0, height);
 			for (let [index, point] of wave.toReversed().entries()) {
@@ -337,5 +340,17 @@ export class ConicalFlaskBaseElement extends LitElement {
 		console.log({value});
 
 		return value;
+	}
+
+	private getInstanceColor(instance: IngredientInstance): ColorInstance {
+		const ingredient = INGREDIENTS[instance.ingredientId];
+		let color = ingredient.color;
+
+		// Make more transparent depending on how little it's cooked
+		const transparent = new Color("transparent");
+		color = ingredient.color.mix(transparent, 1 - Math.max(0.2, Math.min(1, instance.heatedFraction)));
+
+		return color;
+		
 	}
 }
