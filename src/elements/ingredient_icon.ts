@@ -26,7 +26,7 @@ export class IngredientIconElement extends LitElement {
 	public constructor() {
 		super();
 		this.shouldBeDraggable = true;
-		this.ingredientId = "BLUE_PILL";
+		this.ingredientId = "EGG";
 	}
 	protected render(): HTMLTemplateResult {
 		const imageUrl = INGREDIENT_TO_IMAGES[this.ingredientId];
