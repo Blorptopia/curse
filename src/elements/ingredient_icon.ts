@@ -10,6 +10,11 @@ import NightshadeURL from "../assets/ingredients/nightshade.png";
 import LyttaURL from "../assets/ingredients/lytta.png";
 import UnicornHornURL from "../assets/ingredients/unicorn_horn.png";
 import MandrakeURL from "../assets/ingredients/mandrake.png";
+import CrabURL from "../assets/ingredients/crab.png";
+import BeastEnergyURL from "../assets/ingredients/beast_energy.png";
+import ChickenURL from "../assets/ingredients/chicken.png";
+import MonkeyBrainURL from "../assets/ingredients/monkey_brain.png";
+import FlyingOintmentURL from "../assets/ingredients/flying_ointment.png";
 import type { PlaceIngredientData } from "../types/place";
 
 const INGREDIENT_TO_IMAGES = {
@@ -21,7 +26,12 @@ const INGREDIENT_TO_IMAGES = {
 	NIGHTSHADE: NightshadeURL,
 	LYTTA: LyttaURL,
 	UNICORN_HORN: UnicornHornURL,
-	MANDRAKE: MandrakeURL
+	MANDRAKE: MandrakeURL,
+	BEAST_ENERGY: BeastEnergyURL,
+	MONKEY_BRAIN: MonkeyBrainURL,
+	CHICKEN: ChickenURL,
+	CRAB: CrabURL,
+	FLYING_OINTMENT: FlyingOintmentURL,
 } satisfies Record<IngredientId, string>;
 
 @customElement("curse-ingredient-icon")
