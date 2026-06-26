@@ -18,5 +18,8 @@ type IngredientEffects = {
 	consumesIngredient?: {
 		ingredient: IngredientId;
 		every: number;
+	};
+	crash?: {
+		every: number;
 	}
 };

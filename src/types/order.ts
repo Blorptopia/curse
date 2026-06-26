@@ -1,11 +1,11 @@
+import type { HTMLTemplateResult } from "lit";
 import type { CustomerId } from "./customer";
 import type { IngredientId } from "./ingredient";
 
 export type OrderId = string;
 export type Order = {
 	id: OrderId;
-	name: string;
-	description?: string[];
+	description?: (string | HTMLTemplateResult)[];
 	customer: {
 		id: CustomerId;
 		pose?: string;

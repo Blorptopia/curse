@@ -29,8 +29,11 @@ import type { PlaceIngredientData, PlaceItemData } from "../types/place";
 import { BASELINE_TEMPERATURE, ConicalFlaskBaseElement } from "./flask/conical";
 import { IngredientIconElement } from "./ingredient_icon";
 import { ifDefined } from "lit/directives/if-defined.js";
+import { CupElement } from "./cup";
+import { repeat } from "lit/directives/repeat.js";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
+const CUSTOMER_DEATH_CHANCE: number = 0.1;
 
 @customElement("curse-game")
 export class GameElement extends LitElement {
@@ -58,6 +61,10 @@ export class GameElement extends LitElement {
 	private flasksOnHotPlate: string[];
 	@state()
 	private flaskTemperatures: Partial<Record<string, string>>;
+	@state()
+	private valueFromPotion?: number;
+	@state()
+	private customerRejectedOrderReason?: "MISSING_INGREDIENTS";
 
 	// Attributes
 	private constantRigidBodies: RigidBody[];
@@ -471,11 +478,65 @@ export class GameElement extends LitElement {
 			const dialogPages = activeOrder.description?.length ?? 0;
 			const currentDialogPage = activeOrder.description?.[this.dialogIndex] ?? activeOrder.name;
 			const hasMorePages = dialogPages > this.dialogIndex + 1;
-			return html`
-				<div id="dialog">
-					<div id="dialog-heading">
-						<h1>${CUSTOMER_ID_TO_NAME[activeOrder.customer.id]}</h1>
+			
+			let contentFragment: HTMLTemplateResult = html``;
+			if (this.valueFromPotion !== undefined) {
+				if (this.valueFromPotion < 0) {
+					contentFragment = html`
+						<p>What did you just give me? I don't feel so good.</p>
+
+						<div id="actions">
+							<button
+								class="primary"
+								type="button"
+								@click=${() => {
+									this.valueFromPotion = undefined;
+									this.orders = this.orders.slice(1);
+
+									if (Math.random() < CUSTOMER_DEATH_CHANCE) {
+										this.deadCustomerIds = this.deadCustomerIds.concat([activeOrder.customer.id]);
+									}
+								}}
+							>Next customer</button>
+						</div>
+					`;
+				} else {
+					contentFragment = html`
+						<p>What did you just give me? I don't feel so good.</p>
+
+						<div id="actions">
+							<button
+								class="primary"
+								type="button"
+								@click=${() => {
+									this.valueFromPotion = undefined;
+									this.orders = this.orders.slice(1);
+								}}
+							>Next customer</button>
+						</div>
+					`;
+				}
+			} else if (this.customerRejectedOrderReason === "MISSING_INGREDIENTS") {
+				contentFragment = html`
+					<p>This is not my order?</p>
+
+					<div id="actions">
+						<button
+							class="destructive"
+							type="button"
+							@click=${() => {
+								this.orders = [
+									...this.orders.slice(1)
+								];
+								this.dialogIndex = 0;
+							}}
+							?hidden=${!canDecline}
+						>Reject</button>
 					</div>
+				`;
+
+			} else {
+				contentFragment = html`
 					<p>${currentDialogPage}</p>
 
 					<div id="actions">
@@ -487,82 +548,134 @@ export class GameElement extends LitElement {
 									this.dialogIndex++;
 								}}
 							>Next</button>
-						` : html`
-							<button
-								class="destructive"
-								type="button"
-								@click=${() => {
-									this.orders = [
-										...this.orders.slice(1)
-									];
-									this.dialogIndex = 0;
-								}}
-								?hidden=${!canDecline}
-							>Reject</button>
-						`}
+						` : null }
+						<button
+							class="destructive"
+							type="button"
+							@click=${() => {
+								this.orders = [
+									...this.orders.slice(1)
+								];
+								this.dialogIndex = 0;
+							}}
+							?hidden=${!canDecline}
+						>Reject</button>
 					</div>
-				</div>
-			`
-		}
-		const payment = this.getLoanSharkPayment();
-		if (this.dayIndex === 0) {
+				`;
+			}
+
 			return html`
 				<div id="dialog">
 					<div id="dialog-heading">
-						<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK"]}</h1>
+						<h1>${CUSTOMER_ID_TO_NAME[activeOrder.customer.id]}</h1>
+						<div id="order-ingredients">
+							${repeat(activeOrder.requiredIngredients, ingredientId => ingredientId, ingredientId => html`
+								<curse-ingredient-icon .ingredientId=${ingredientId}></curse-ingredient-icon>
+							 `)}
+						</div>
 					</div>
-					<p>Dialoge here</p>
+					${contentFragment}
 				</div>
 			`
 		}
-
+		const payment = this.getLoanSharkPayment(this.dayIndex);
+		const tomorrowsPayment = this.getLoanSharkPayment(this.dayIndex);
+		const dialog: (string | HTMLTemplateResult)[][] = [
+			[
+				"Hello there good pal old friend. Great to see the business doing good!",
+				"Nice to see that you have finally got your life around and started earning money again",
+				"Though uh, I do still need you to pay your loan back.",
+				html`I will be kind and let you off the hook this time, however I will be back tomorrow for ${tomorrowsPayment}.`,
+				"Or else."
+			],
+			[
+				"Well hello there again, I have returned as promised",
+				html`Pay me <span class="price" ?data-can-afford=${payment < this.balance}>${payment}$</span>. Tomorrow it's ${tomorrowsPayment}$`
+			],
+			[
+				"It's payment time my friend old pal",
+				html`Pay up <span class="price" ?data-can-afford=${payment < this.balance}>${payment}$</span>`
+			]
+		];
+		const dialogSet = dialog[this.dayIndex] ?? dialog[dialog.length - 1];
+		const hasMorePages = this.dialogIndex !== dialogSet.length - 1
 		return html`
 			<div id="dialog">
 				<div id="dialog-heading">
 					<h1>${CUSTOMER_ID_TO_NAME["LOANS_HARK"]}</h1>
 				</div>
-				<p>I'm here for my daily payment of <span class="price">${payment}</span></p>
+				<p>${dialogSet[this.dialogIndex]}</p>
 				<div id="actions">
-					<button class="primary">Pay</button>
-					<button class="destructive">Reject</button>
+					<button
+						?hidden=${!hasMorePages}
+						@click=${() => this.dialogIndex++}
+					>Next</button>
+					<button
+						class="primary"
+						?hidden=${hasMorePages || this.dayIndex !== 0}
+						@click=${() => {
+							this.dialogIndex = 0;
+							this.dayIndex++;
+							this.orders = this.createOrders();
+						}}
+					>Close for the day</button>
+					<button
+						class="primary"
+						?disabled=${this.balance < payment}
+						?hidden=${hasMorePages || this.dayIndex === 0}
+						@click=${() => {
+							this.balance -= payment;
+							this.dialogIndex = 0;
+							this.dayIndex++;
+							this.orders = this.createOrders();
+						}}
+					>Pay ${payment}$</button>
+					<button
+						class="dangerous"
+						?hidden=${hasMorePages || this.dayIndex === 0}
+						@click=${() => {
+							location.href = "/game-over";
+						}}
+					>Reject</button>
 				</div>
 			</div>
-		`
+		`;
 	}
 	private createOrderTemplates(): OrderTemplate[] {
+		const LORE_MULTIPLIER = 1.1;
 		const JACK_INTERACTIONS: OrderTemplate[] = [
+			// Day 1
 			{
-				name: "Genius potion",
 				description: ["My wife keeps winning at trivia and maths, please make me a genius potion."],
 				customer: {
 					id: "JACK",
 				},
 				requiredIngredients: ["BURGER"],
-				baseValue: 1
+				baseValue: LORE_MULTIPLIER
 			},
+			// Day 2
 			{
-				name: "Stupid potion",
 				description: ["I never lose to my wife anymore, but somehow, i learned to speak dog. All my dog does is argue politics with me now. Please make me a stupid potion."],
 				customer: {
 					id: "JACK",
 				},
 				requiredIngredients: ["BURGER"],
-				baseValue: 1
+				baseValue: LORE_MULTIPLIER
 			},
+			// Day 3
 			{
-				name: "Antidepressant potion",
 				description: ["Now that i'm stupid, both my dog and wife keep beating me at everything.\nI still speak dog.\nPlease make me an anti-depression potion."],
 				customer: {
 					id: "JACK",
 				},
 				requiredIngredients: ["BURGER"],
-				baseValue: 1
+				baseValue: LORE_MULTIPLIER
 			},
 
 		];
 		const JOANY_INTERACTIONS: OrderTemplate[] = [
+			// Day 2
 			{
-				name: "Confidence potion",
 				description: [
 					"Hey I could need some help",
 					"I need some confidence for this job interview, could you help me out?"
@@ -571,24 +684,128 @@ export class GameElement extends LitElement {
 					id: "JOANY",
 				},
 				requiredIngredients: ["BURGER"],
-				baseValue: 1
+				baseValue: LORE_MULTIPLIER
 			},
+		];
+		const WHICKY_INTERACTIONS: OrderTemplate[] = [
+			// Day 3
+			{
+				description: [
+					"Well, hey there Sweetie. Please don’t say you stick your boggers on the walls of this hotdog van.",
+					"Well enough about you wizard boy. I want a potion that makes my wrinkles on my face go away so I don’t look like Scooby doo."
+				],
+				customer: {
+					id: "WHICKY_VEQUILIA"
+				},
+				requiredIngredients: ["CRAB", "EGG"],
+				baseValue: LORE_MULTIPLIER
+			},
+			// Day 5
+			{
+				description: [
+					"Oh heavens! Are you able to cast a spell to fix that awful mask you’re wearing?",
+					"Oh? It’s just your face? Well…you should probably start using a mask then.",
+					"Enough chit-chat. I want a Cat parfyme to my 101 cats. They are constantly walking around, smelling like tuna and ass."
+				],
+				customer: {
+					id: "WHICKY_VEQUILIA"
+				},
+				requiredIngredients: ["CRAB", "EGG"],
+				baseValue: LORE_MULTIPLIER
+			}
+		];
+		const TIM_TOM_INTERACTIONS: OrderTemplate[] = [
+			// Day 1
+			{
+				description: [
+					"HEY THERE FRIEND! WE ARE FRINEDS RIGHT?!",
+					"SAY THAT YOU HATE WOMEN!!",
+					"WHAT I WANT!? I WANT A 67 TUNG TUNG DRINK POTION!"
+				],
+				customer: {
+					id: "TIM_TOM"
+				},
+				requiredIngredients: ["CRAB", "EGG"],
+				baseValue: LORE_MULTIPLIER
+			},
+			// Day 2
+			{
+				description: [
+					"HELLO FRIEND! WE ARE BEST FRIENDS RIGHT???",
+					"What? No I am not recording you!",
+					"But if I was. Would you ask everyone to go follow TimTomLegendBeast on TikTok?",
+					"COULD I ALSO GET A POTION TO BE THE MOST ANNOYING PERSON ON EARTH??",
+				],
+				customer: {
+					id: "TIM_TOM"
+				},
+				requiredIngredients: ["CRAB", "EGG"],
+				baseValue: LORE_MULTIPLIER
+			},
+			// Day 3
+			{
+				description: [
+					"THAT GUY BEHIND ME LIKES YOU!!",
+					"HAHAHAhaha…ha…",
+					html`btw….could I get..<span class="small">uh…a potion that makes..uh..tiny things grow longer</span>`,
+					html`<span class="small">COULD I ALSO GET A POTION TO BE THE MOST ANNOYING PERSON ON EARTH??</span>`
+				],
+				customer: {
+					id: "TIM_TOM"
+				},
+				requiredIngredients: ["CRAB", "EGG"],
+				baseValue: LORE_MULTIPLIER
+			},
+		];
+		const RONNY_INTERACTIONS: OrderTemplate[] = [
+			// Day 1
+			{
+				description: [
+					"Hello there adult! I want ONE energy drink ultra extreme potion. To ONE man!",
+				],
+				customer: {
+					id: "OLE_MARTINSSON"
+				},
+				requiredIngredients: ["EGG"],
+				baseValue: LORE_MULTIPLIER
+			},
+			{
+				description: [
+					"Great weather we are having adult! I just came from work and gave a kiss to my beautiful wife! Could I get ONE fly potion. To ONE man?",
+				],
+				customer: {
+					id: "OLE_MARTINSSON"
+				},
+				requiredIngredients: ["EGG"],
+				baseValue: LORE_MULTIPLIER
+			}
 		];
 		const templates: OrderTemplate[] = [];
 		if (this.dayIndex === 0) {
-			templates.push(JOANY_INTERACTIONS[0]);
+			templates.push(RONNY_INTERACTIONS[0]);
 			templates.push(JACK_INTERACTIONS[0]);
+			templates.push(TIM_TOM_INTERACTIONS[0]);
+			templates.push(RONNY_INTERACTIONS[1]);
 		}
 		if (this.dayIndex === 1) {
+			templates.push(TIM_TOM_INTERACTIONS[1]);
 			templates.push(JACK_INTERACTIONS[1]);
+			templates.push(JOANY_INTERACTIONS[0]);
 		}
 		if (this.dayIndex === 2) {
+			templates.push(TIM_TOM_INTERACTIONS[2]);
 			templates.push(JACK_INTERACTIONS[2]);
+			templates.push(WHICKY_INTERACTIONS[0]);
+		}
+		if (this.dayIndex === 3) {
+
+		}
+		if (this.dayIndex === 5) {
+			templates.push(WHICKY_INTERACTIONS[1]);
 		}
 
 		const RANDOM_ORDER_TEMPLATES: OrderTemplate[] = [
 			{
-				name: "Armor potion",
 				customer: {
 					id: "JACK",
 				},
@@ -596,7 +813,6 @@ export class GameElement extends LitElement {
 				baseValue: 1
 			},
 			{
-				name: "Upside-down potion",
 				customer: {
 					id: "JACK",
 				},
@@ -614,7 +830,7 @@ export class GameElement extends LitElement {
 	}
 	private createOrders(): Order[] {
 		const templates = this.createOrderTemplates();
-		const templatesWithoutDeadCustomers = templates.filter(template => !this.deadCustomerIds.includes(template.customerId));
+		const templatesWithoutDeadCustomers = templates.filter(template => !this.deadCustomerIds.includes(template.customer.id));
 
 		const orders = templatesWithoutDeadCustomers.map(template => {
 			const valueRandomMultiplier = 1 + (Math.random() * RANDOM_VALUE_VARIATION) - (RANDOM_VALUE_VARIATION / 2);
@@ -623,7 +839,6 @@ export class GameElement extends LitElement {
 			const value = Math.floor(template.baseValue * valueRandomMultiplier * valueReputationMultipier * valueDayMultiplier);
 			const order = {
 				id: crypto.randomUUID(),
-				name: template.name,
 				description: template.description,
 				customer: template.customer,
 				requiredIngredients: template.requiredIngredients,
@@ -646,17 +861,17 @@ export class GameElement extends LitElement {
 		const baseValue = 150;
 		return baseValue - (this.dayIndex * 10);
 	}
-	private getLoanSharkPayment(): number {
-		if (this.dayIndex === 0) {
+	private getLoanSharkPayment(dayIndex: number): number {
+		if (dayIndex === 0) {
 			return 50;
 		}
-		if (this.dayIndex === 1) {
+		if (dayIndex === 1) {
 			return 150;
 		}
-		if (this.dayIndex === 2) {
+		if (dayIndex === 2) {
 			return 250;
 		}
-		if (this.dayIndex === 3) {
+		if (dayIndex === 3) {
 			return 350;
 		}
 		return 550;
@@ -724,6 +939,7 @@ export class GameElement extends LitElement {
 	public handleCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
 		this.handlePlaceItemCollisionEvent(collider1, collider2, started);
 		this.handleHotPlateCollisionEvent(collider1, collider2, started);
+		this.handleUseCupCollisionEvent(collider1, collider2, started);
 
 	}
 	private handlePlaceItemCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
@@ -765,48 +981,6 @@ export class GameElement extends LitElement {
 			entity2.element.addIngredient(entity1.element.ingredientId);
 
 		}
-	}
-	public handleContactEvent(event: TempContactForceEvent): void {
-		if (this.physics === undefined) {
-			return;
-		}
-		const magnitude = event.maxForceMagnitude();
-		if (magnitude < 5 || magnitude > 30) {
-			return;
-		}
-		if (this.cursorJoint !== undefined) {
-			console.log(`ignoring crash with ${magnitude}mag due cursor being used (stuck inside something?)`);
-			return;
-		}
-		console.log(`crash @ ${magnitude}`);
-		const collider1 = this.physics.world.getCollider(event.collider1())!;
-		const collider2 = this.physics.world.getCollider(event.collider2())!;
-
-		const rigidBody1 = collider1.parent();
-		const rigidBody2 = collider2.parent();
-
-		if (rigidBody1) {
-			this.handleCrash(rigidBody1, magnitude)
-		}
-		if (rigidBody2) {
-			this.handleCrash(rigidBody2, magnitude)
-		}
-	}
-	private handleCrash(rigidBody: RigidBody, magnitude: number): void {
-		const userData = rigidBody?.userData as PhysicsUserData | undefined;
-		const entityId = userData?.entityId;
-
-		if (entityId === undefined) {
-			return;
-		}
-		const entity = this.entities[entityId];
-		if (entity === undefined) {
-			return;
-		}
-		if (entity.element instanceof ConicalFlaskBaseElement) {
-			entity.element.registerCrash(magnitude);
-		}
-
 	}
 	private handleHotPlateCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
 		const rigidBody1 = collider1.parent();
@@ -854,6 +1028,111 @@ export class GameElement extends LitElement {
 			} else {
 				this.flasksOnHotPlate = this.flasksOnHotPlate.filter(id => id !== entity2Id);
 			}
+		}
+
+	}
+	private handleUseCupCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
+		const rigidBody1 = collider1.parent();
+		const rigidBody2 = collider2.parent();
+		if (!started) {
+			return;
+		}
+		if (rigidBody1 === null || rigidBody2 === null) {
+			return;
+		}
+		if (this.physics === undefined) {
+			return;
+		}
+		const userData1 = rigidBody1.userData as PhysicsUserData | undefined;
+		const userData2 = rigidBody2.userData as PhysicsUserData | undefined;
+
+		const entity1Id = userData1?.entityId;
+		const entity2Id = userData2?.entityId;
+
+		if (entity1Id === undefined || entity2Id === undefined) {
+			return;
+		}
+
+		const entity1 = this.entities[entity1Id]!;
+		const entity2 = this.entities[entity2Id]!;
+
+		const activeOrder = this.orders[0];
+		if (activeOrder === undefined) {
+			return;
+		}
+		if (this.valueFromPotion) {
+			return;
+		}
+
+
+		if (entity1.element instanceof ConicalFlaskBaseElement && entity2.element instanceof CupElement) {
+			entity2.element.remove();
+			delete this.entities[entity2Id];
+			this.physics.world.removeRigidBody(rigidBody2);
+			const usedIngredientIds = Object.values(entity1.element.instances).map(instance => instance!.ingredientId);
+			for (const ingredientId of activeOrder.requiredIngredients) {
+				if (!usedIngredientIds.includes(ingredientId)) {
+					this.customerRejectedOrderReason = "MISSING_INGREDIENTS";
+					return;
+				}
+			}
+			this.valueFromPotion = entity1.element.consumeAndGetValue();
+			this.customerRejectedOrderReason = undefined;
+		}
+		if (entity2.element instanceof ConicalFlaskBaseElement && entity1.element instanceof CupElement) {
+			entity1.element.remove();
+			delete this.entities[entity1Id];
+			this.physics.world.removeRigidBody(rigidBody1);
+			const usedIngredientIds = Object.values(entity2.element.instances).map(instance => instance!.ingredientId);
+			for (const ingredientId of activeOrder.requiredIngredients) {
+				if (!usedIngredientIds.includes(ingredientId)) {
+					this.customerRejectedOrderReason = "MISSING_INGREDIENTS";
+					return;
+				}
+			}
+			this.valueFromPotion = entity2.element.consumeAndGetValue();
+			this.customerRejectedOrderReason = undefined;
+		}
+	}
+	public handleContactEvent(event: TempContactForceEvent): void {
+		if (this.physics === undefined) {
+			return;
+		}
+		const magnitude = event.maxForceMagnitude();
+		if (magnitude < 5 || magnitude > 30) {
+			return;
+		}
+		if (this.cursorJoint !== undefined) {
+			console.log(`ignoring crash with ${magnitude}mag due cursor being used (stuck inside something?)`);
+			return;
+		}
+		console.log(`crash @ ${magnitude}`);
+		const collider1 = this.physics.world.getCollider(event.collider1())!;
+		const collider2 = this.physics.world.getCollider(event.collider2())!;
+
+		const rigidBody1 = collider1.parent();
+		const rigidBody2 = collider2.parent();
+
+		if (rigidBody1) {
+			this.handleCrash(rigidBody1, magnitude)
+		}
+		if (rigidBody2) {
+			this.handleCrash(rigidBody2, magnitude)
+		}
+	}
+	private handleCrash(rigidBody: RigidBody, magnitude: number): void {
+		const userData = rigidBody?.userData as PhysicsUserData | undefined;
+		const entityId = userData?.entityId;
+
+		if (entityId === undefined) {
+			return;
+		}
+		const entity = this.entities[entityId];
+		if (entity === undefined) {
+			return;
+		}
+		if (entity.element instanceof ConicalFlaskBaseElement) {
+			entity.element.registerCrash(magnitude);
 		}
 
 	}
@@ -1010,16 +1289,30 @@ export class GameElement extends LitElement {
 			color: black;
 			border-radius: .75rem;
 
+			user-select: none;
+
 			#dialog-heading {
 				display: flex;
-				align-content: center;
+				align-items: center;
 				justify-content: space-between;
+				gap: 2rem;
 			}
 			h1 {
 				margin: 0;
 				vertical-align: middle;
 			}
-			user-select: none;
+			#order-ingredients {
+				background: black;
+				padding: .5rem;
+				border-radius: 1rem;
+
+				display: flex;
+				gap: 1rem;
+				
+				curse-ingredient-icon {
+					--size-multiplier: 0.02rem;
+				}
+			}
 		}
 		.listing-details {
 			position: absolute;
@@ -1054,6 +1347,10 @@ export class GameElement extends LitElement {
 		}
 		curse-conical-flask {
 			--size-multiplier: 0.1rem;
+		}
+		.small {
+			font-size: .8em;
+			font-style: italic;
 		}
 	`;
 }

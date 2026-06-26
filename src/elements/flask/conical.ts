@@ -11,6 +11,7 @@ import { hotPlateActivatedContext } from "../../lib/context";
 import { consume } from "@lit/context";
 
 export const BASELINE_TEMPERATURE = 20;
+const PRICE_MULTIPLIER = 1.1;
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {
@@ -28,16 +29,14 @@ export class ConicalFlaskBaseElement extends LitElement {
 	@consume({context: hotPlateActivatedContext, subscribe: true})
 	@property({type: Boolean})
 	public hotPlateActivated: boolean;
+	@property({type: Array})
+	public instances: Partial<Record<string, IngredientInstance>>;
 
 	// Elements
 	@query("img")
 	private imageElement?: HTMLImageElement;
 	@query("canvas")
 	private canvasElement?: HTMLCanvasElement;
-
-	// State
-	@state()
-	private instances: Partial<Record<string, IngredientInstance>>;
 
 	// Attributes
 	private renderTask: Task<[HTMLCanvasElement | undefined, boolean], void>;
@@ -170,6 +169,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 				ingredientId,
 				mixedFraction: 0,
 				poisonFraction: 0,
+				heatedFraction: 0,
 				spinsFromStart: 0,
 				totalRotation: 0
 		} satisfies IngredientInstance;
@@ -276,5 +276,36 @@ export class ConicalFlaskBaseElement extends LitElement {
 		}
 
 		return canvas;
+	}
+
+	public consumeAndGetValue(): number {
+		let value = 0;
+		for (const instance of Object.values(this.instances)) {
+			if (instance === undefined) {
+				continue;
+			}
+			const ingredient = INGREDIENTS[instance.ingredientId];
+			let instanceValue = 0;
+			// Positive effects
+			instanceValue += ingredient.price * Math.min(1, instance.mixedFraction);
+
+			// Dual sided
+			let heatMultiplier = 1;
+			if (instance.heatedFraction > 1) {
+				heatMultiplier -= Math.max(2, instance.heatedFraction);
+			} else {
+				heatMultiplier -= 1 - instance.heatedFraction;
+			}
+			instanceValue += ingredient.price * heatMultiplier;
+
+			// Negative effects
+			instanceValue -= instanceValue * 2 * instance.poisonFraction;
+			
+			value += instanceValue;
+		}
+
+		this.instances = {};
+
+		return value;
 	}
 }
