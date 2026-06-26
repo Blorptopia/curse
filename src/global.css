@@ -4,12 +4,3 @@
 	--size-multiplier: 0.1rem;
 	--wall-color: #775079;
 }
-html {
-	height: 100%;
-}
-
-body {
-	height: 100%;
-	margin: 0;
-}
-

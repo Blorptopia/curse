@@ -28,3 +28,12 @@
 .primary:hover {
 	background: #773a7c;
 }
+html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	margin: 0;
+}
+

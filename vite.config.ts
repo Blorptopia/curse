@@ -9,7 +9,8 @@ const ENTRYPOINTS = [
 	"index.html",
 	"game.html",
 	"game-over.html",
-	"credits.html"
+	"credits.html",
+	"tutorial.html"
 ];
 
 

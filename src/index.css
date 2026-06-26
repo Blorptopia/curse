@@ -41,3 +41,20 @@ h1 {
 .secondary:hover {
 	color: #ccc;
 }
+
+#icon {
+	--source-height: 184;
+	--source-width: 120;
+	--size-multipler: 0.005rem;
+	height: calc(var(--source-height) * var(--size-multiplier));
+	width: calc(var(--source-width) * var(--size-multiplier));
+}
+html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	margin: 0;
+}
+
