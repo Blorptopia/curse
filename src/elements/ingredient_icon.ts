@@ -4,12 +4,24 @@ import type { IngredientId } from "../types/ingredient";
 import BurgerURL from "../assets/ingredients/burger.png";
 import FlatBurgerURL from "../assets/ingredients/flat_burger.png";
 import EggURL from "../assets/ingredients/egg.png";
+import WormURL from "../assets/ingredients/worm.png";
+import MelatoninURL from "../assets/ingredients/melatonin.png";
+import NightshadeURL from "../assets/ingredients/nightshade.png";
+import LyttaURL from "../assets/ingredients/lytta.png";
+import UnicornHornURL from "../assets/ingredients/unicorn_horn.png";
+import MandrakeURL from "../assets/ingredients/mandrake.png";
 import type { PlaceIngredientData } from "../types/place";
 
 const INGREDIENT_TO_IMAGES = {
 	BURGER: BurgerURL,
 	FLAT_BURGER: FlatBurgerURL,
-	EGG: EggURL
+	EGG: EggURL,
+	WORM: WormURL,
+	MELOTONIN: MelatoninURL,
+	NIGHTSHADE: NightshadeURL,
+	LYTTA: LyttaURL,
+	UNICORN_HORN: UnicornHornURL,
+	MANDRAKE: MandrakeURL
 } satisfies Record<IngredientId, string>;
 
 @customElement("curse-ingredient-icon")

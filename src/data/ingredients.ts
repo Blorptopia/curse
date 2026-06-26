@@ -54,10 +54,82 @@ const CHICKEN: IngredientInfo = {
 	price: 50,
 	color: Color("#ae3ed1"),
 };
+const WORM: IngredientInfo = {
+	name: "Worm",
+	description: "Likes to dig. Very britle",
+	effects: {
+		tempratureRange: {
+			max: 30
+		}
+	},
+	price: 50,
+	color: Color("#ae3ed1"),
+};
+const NIGHTSHADE: IngredientInfo = {
+	name: "Nightshade",
+	description: "Quite a pretty flower",
+	effects: {
+		tempratureRange: {
+			max: 30
+		}
+	},
+	price: 50,
+	color: Color("#ae3ed1"),
+};
+const MELOTONIN: IngredientInfo = {
+	name: "MELOTONIN",
+	description: "Eeepy pills",
+	effects: {
+		tempratureRange: {
+			max: 30
+		}
+	},
+	price: 50,
+	color: Color("#ae3ed1"),
+};
+const LYTTA: IngredientInfo = {
+	name: "Lytta Vesicatoria",
+	description: "Some weird spanish fly",
+	effects: {
+		tempratureRange: {
+			max: 30
+		}
+	},
+	price: 50,
+	color: Color("#ae3ed1"),
+};
+const MANDRAKE: IngredientInfo = {
+	name: "Mandrake",
+	description: "Wormy worm",
+	effects: {
+		tempratureRange: {
+			max: 30
+		}
+	},
+	price: 50,
+	color: Color("#ae3ed1"),
+};
+const UNICORN_HORN: IngredientInfo = {
+	name: "Unicorn horn",
+	description: "Kindly donated by a unicorn startup",
+	effects: {
+		tempratureRange: {
+			max: 30
+		}
+	},
+	price: 50,
+	color: Color("#ae3ed1"),
+};
 export const INGREDIENTS = {
 	BURGER,
 	FLAT_BURGER,
 	CRAB,
 	CHICKEN,
-	EGG
+	EGG,
+	WORM,
+	NIGHTSHADE,
+	MELOTONIN,
+	LYTTA,
+	MANDRAKE,
+	UNICORN_HORN,
 } as const;
