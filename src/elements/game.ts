@@ -779,6 +779,30 @@ export class GameElement extends LitElement {
 				requiredIngredients: ["CRAB", "EGG"],
 				baseValue: LORE_MULTIPLIER
 			},
+			// Day 4
+			{
+				description: [
+					"My neighbor’s flower garden is beautiful, and smells of heaven.",
+					"Brew me a Weed-Killer Potion."
+				],
+				customer: {
+					id: "WHICKY_VEQUILIA"
+				},
+				requiredIngredients: ["CRAB", "EGG"],
+				baseValue: LORE_MULTIPLIER
+			},
+			{
+				description: [
+					"I hate my kid. There’s a hurricane on the way.",
+					"Brew me a Levitation Potion."
+				],
+				customer: {
+					id: "WHICKY_VEQUILIA",
+				},
+				requiredIngredients: ["CRAB", "EGG"],
+				baseValue: LORE_MULTIPLIER
+			},
+
 			// Day 3
 			{
 				description: [

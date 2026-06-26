@@ -137,7 +137,7 @@ export class HotPlateElement extends LitElement {
 			audio.play();
 
 			this.fireAudio.pause();
-			this.fireAudio.fastSeek(Math.random() * 5);
+			this.fireAudio.currentTime = Math.random() * 5;
 		}
 		if (this.state === "pressed") {
 			const event = new CustomEvent("curseenablehotplate");
