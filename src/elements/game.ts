@@ -9,7 +9,7 @@ import "./flask/conical";
 import "./physics_world";
 import { map } from "lit/directives/map.js";
 import type { Order, OrderTemplate } from "../types/order";
-import { MAX_ORDERS_PER_DAY, STAND_HEIGHT_METERS, FLASK_BASELINE_TEMPERATURE } from "../config";
+import { MAX_ORDERS_PER_DAY, STAND_HEIGHT_METERS, FLASK_BASELINE_TEMPERATURE, FLASK_MAX_TEMPERATURE } from "../config";
 import type { CustomerId } from "../types/customer";
 import { styleMap } from "lit/directives/style-map.js";
 import { CUSTOMER_ID_TO_NAME } from "../data/customer";
@@ -217,7 +217,7 @@ export class GameElement extends LitElement {
 									...this.flaskTemperatures,
 									[entityId]: visualElement!.temperature
 								};
-								if (visualElement!.temperature > 100) {
+								if (visualElement!.temperature > FLASK_MAX_TEMPERATURE) {
 									const audioURL = FLASK_BREAK_SOUND_URLS[Math.floor(Math.random() * FLASK_BREAK_SOUND_URLS.length)];
 									const audio = new Audio(audioURL);
 									audio.play();

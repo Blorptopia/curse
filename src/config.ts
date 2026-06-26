@@ -14,3 +14,4 @@ export const PHYSICS_DEBUG: boolean = false;
 export const PHYSICS_DEBUG_RES: number = 500;
 export const STAND_HEIGHT_METERS = 1.5;
 export const FLASK_BASELINE_TEMPERATURE = 20;
+export const FLASK_MAX_TEMPERATURE = 100;

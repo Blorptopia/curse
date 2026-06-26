@@ -10,7 +10,7 @@ import ReleaseAudio1URL from "../assets/hot_plate/button/release/1.wav";
 import ReleaseAudio2URL from "../assets/hot_plate/button/release/2.wav";
 import ReleaseAudio3URL from "../assets/hot_plate/button/release/3.wav";
 import FireAudioURL from "../assets/hot_plate/fire.mp3";
-import { IGNITION_OFFSET_MS } from "../config";
+import { FLASK_MAX_TEMPERATURE, IGNITION_OFFSET_MS } from "../config";
 import { repeat } from "lit/directives/repeat.js";
 
 const PRESS_AUDIO_URLS: string[] = [
@@ -75,7 +75,7 @@ export class HotPlateElement extends LitElement {
 			>
 			<div id="temperatures-container">
 				${repeat(this.temperatures, temperature => temperature, temperature => html`
-					<span class="temperature" ?data-high=${temperature > 90}>${temperature} &deg;C</span>
+					<span class="temperature" ?data-high=${temperature > FLASK_MAX_TEMPERATURE - 15}>${temperature} &deg;C</span>
 				`)}
 		`; 
 	}
