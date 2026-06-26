@@ -228,7 +228,10 @@ export class ConicalFlaskBaseElement extends LitElement {
 
 
 		for (let index = 0; index <= this.liquidResolution; index++) {
-			let point = Math.sin(angleIncrement * index + Date.now() / 1000) * this.wavelength + Math.random() * (this.temperature - 20) / 10;
+			let point = Math.sin(angleIncrement * index + Date.now() / 1000) * this.wavelength
+
+			point += Math.min(6, Math.random() * (this.temperature - 20) / 10);
+
 			wave.push(point);
 		}
 
