@@ -32,8 +32,17 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { CupElement } from "./cup";
 import { repeat } from "lit/directives/repeat.js";
 
+import FlaskKnock1 from "../assets/flask/conical/knock/1.wav";
+import FlaskKnock2 from "../assets/flask/conical/knock/2.wav";
+import FlaskKnock3 from "../assets/flask/conical/knock/3.wav";
+
 const RANDOM_VALUE_VARIATION: number = 0.1;
 const CUSTOMER_DEATH_CHANCE: number = 0.1;
+const FLASK_KNOCK_SOUND_URLS: string[] = [
+	FlaskKnock1,
+	FlaskKnock2,
+	FlaskKnock3
+];
 
 @customElement("curse-game")
 export class GameElement extends LitElement {
@@ -1126,10 +1135,10 @@ export class GameElement extends LitElement {
 		const rigidBody2 = collider2.parent();
 
 		if (rigidBody1) {
-			this.handleCrash(rigidBody1, magnitude)
+			this.handleCrash(rigidBody1, magnitude);
 		}
 		if (rigidBody2) {
-			this.handleCrash(rigidBody2, magnitude)
+			this.handleCrash(rigidBody2, magnitude);
 		}
 	}
 	private handleCrash(rigidBody: RigidBody, magnitude: number): void {
@@ -1146,6 +1155,10 @@ export class GameElement extends LitElement {
 		if (entity.element instanceof ConicalFlaskBaseElement) {
 			entity.element.registerCrash(magnitude);
 		}
+
+		const soundURL = FLASK_KNOCK_SOUND_URLS[Math.floor(Math.random() * FLASK_KNOCK_SOUND_URLS.length)];
+		const sound = new Audio(soundURL);
+		sound.play();
 
 	}
 	public static styles?: CSSResultGroup = css`
