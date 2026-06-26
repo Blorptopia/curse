@@ -67,7 +67,7 @@ const WORM: IngredientInfo = {
 };
 const NIGHTSHADE: IngredientInfo = {
 	name: "Nightshade",
-	description: "Quite a pretty flower",
+	description: "Beautiful woman",
 	effects: {
 		tempratureRange: {
 			max: 30
@@ -100,7 +100,7 @@ const LYTTA: IngredientInfo = {
 };
 const MANDRAKE: IngredientInfo = {
 	name: "Mandrake",
-	description: "Wormy worm",
+	description: "Screaming baby plant",
 	effects: {
 		tempratureRange: {
 			max: 30

@@ -385,6 +385,10 @@ export class GameElement extends LitElement {
 			<dt>Price</dt>
 			<dd class="price" ?data-can-afford=${this.balance >= ingredient.price}>${ingredient.price}$</dd>
 	   	`);
+		factFragments.push(html`
+			<dt>Target color</dt>
+			<dd><div class="target-color" style=${styleMap({backgroundColor: ingredient.color.toString()})}></div></dd>
+		`);
 
 		if (ingredient.effects.cannotBeMixedWith !== undefined) {
 			factFragments.push(html`
@@ -1416,6 +1420,11 @@ export class GameElement extends LitElement {
 		.small {
 			font-size: .8em;
 			font-style: italic;
+		}
+		.target-color {
+			--size: 1rem;
+			height: var(--size);
+			width: var(--size);
 		}
 	`;
 }
