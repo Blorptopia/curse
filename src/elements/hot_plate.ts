@@ -198,6 +198,8 @@ export class HotPlateElement extends LitElement {
 		}
 		.temperature {
 			background: #5c1361;
+			padding: .5rem;
+			border-radius: .5rem;
 		}
 		.temperature[data-high] {
 			color: red;
