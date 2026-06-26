@@ -320,6 +320,9 @@ export class ConicalFlaskBaseElement extends LitElement {
 			const wronglyHeatedFraction = Math.min(instance.wronglyHeatedScore, FLASK_MAX_OVERHEAT_SCORE) / FLASK_MAX_OVERHEAT_SCORE;
 			instanceValue -= wronglyHeatedFraction * ingredient.price * 0.5;
 			value += instanceValue;
+
+			const mixedFraction = Math.min(instance.totalRotation / FLASK_REQUIRED_ROTATION, 1);
+			instanceValue -= mixedFraction * ingredient.price * 0.25;
 		}
 
 		this.instances = {};
