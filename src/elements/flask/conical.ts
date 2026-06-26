@@ -6,6 +6,7 @@ import { Task } from "@lit/task";
 import type { IngredientId } from "../../types/ingredient";
 import type { IngredientInstance } from "../../types/flask";
 import MaskImageURL from "../../assets/flask/conical/mask.png?url";
+import { INGREDIENTS } from "../../data/ingredients";
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {
@@ -31,6 +32,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 	private renderTask: Task<[HTMLCanvasElement | undefined, boolean], void>;
 
 	private liquidResolution: number;
+	private maxLiquid: number;
 	private wavelength: number;
 
 	public constructor() {
@@ -52,10 +54,6 @@ export class ConicalFlaskBaseElement extends LitElement {
 					return;
 				}
 				while (!signal.aborted) {
-					const angleIncrement = (Math.PI * 2) / this.liquidResolution;
-					const height = canvas.height / 4;
-					let wave: number[] = [];
-
 					const maskImage = new Image();
 					maskImage.src = MaskImageURL;
 					context.imageSmoothingEnabled = false;
@@ -63,34 +61,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 					context.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
 					context.globalCompositeOperation = "source-in";
 
-					const tempCanvas = document.createElement("canvas");
-					const tempContext = tempCanvas.getContext("2d")!;
-					tempCanvas.width = canvas.width;
-					tempCanvas.height = canvas.height;
-
-
-					tempContext.fillStyle = "#2b6be3";
-					tempContext.beginPath();
-					tempContext.moveTo(0, height);
-					for (let index = 0; index <= this.liquidResolution; index++) {
-						wave.push(height + Math.sin(angleIncrement * index) * this.wavelength);
-						tempContext.lineTo(canvas.width / this.liquidResolution * index, height + Math.sin(angleIncrement * index) * this.wavelength);
-					}
-					tempContext.lineTo(canvas.width, canvas.height);
-					tempContext.lineTo(0, canvas.height);
-					tempContext.fill();
-
-					tempContext.fillStyle = "#34faf3";
-					tempContext.beginPath();
-					tempContext.moveTo(0, height);
-					for (let [index, point] of wave.toReversed().entries()) {
-						tempContext.lineTo(canvas.width / this.liquidResolution * index, point);
-					}
-					tempContext.lineTo(canvas.width, canvas.height);
-					tempContext.lineTo(0, canvas.height);
-					tempContext.fill();
-
-					context.drawImage(tempCanvas, 0, 0);
+					context.drawImage(this.drawIngredients(canvas.width, canvas.height)!, 0, 0);
 					context.restore()
 
 					context.drawImage(this.imageElement!, 0, 0, canvas.width, canvas.height);
@@ -102,6 +73,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 		});
 		this.liquidResolution = 20;
 		this.wavelength = 10;
+		this.maxLiquid = 10;
 	}
 	protected render(): HTMLTemplateResult {
 	   	return html`
@@ -206,4 +178,63 @@ export class ConicalFlaskBaseElement extends LitElement {
 		}
 	}
 	public registerCrash(magnitude: number): void {}
+	private drawIngredients(canvasWidth: number, canvasHeight: number): HTMLCanvasElement | undefined {
+		if (this.instances === undefined) {
+			return;
+		}
+
+		const canvas = document.createElement("canvas");
+		const context = canvas.getContext("2d")!;
+		canvas.width = canvasWidth;
+		canvas.height = canvasHeight;
+
+		const angleIncrement = (Math.PI * 2) / this.liquidResolution;
+		let wave: number[] = [];
+
+		for (let index = 0; index <= this.liquidResolution; index++) {
+			wave.push(Math.sin(angleIncrement * index) * this.wavelength);
+		}
+
+		let ingredientIndex = 0;
+
+		const instances = Object.values(this.instances);
+
+		for (const instance of instances.toReversed()) {
+			if (instance === undefined) {
+				continue;
+			}
+
+			const ingredient = INGREDIENTS[instance.ingredientId];
+
+			const liquidScale = canvasHeight / this.maxLiquid
+
+			const height = canvasHeight + liquidScale * (ingredientIndex + 1) - liquidScale * instances.length;
+
+			if (ingredientIndex === 0) {
+				context.fillStyle = ingredient.color.darken(.2).toString();
+				context.beginPath();
+				context.moveTo(0, height);
+				for (let [index, point] of wave.entries()) {
+					context.lineTo(canvas.width / this.liquidResolution * index, height + point - this.wavelength * 2);
+				}
+				context.lineTo(canvas.width, canvas.height);
+				context.lineTo(0, canvas.height);
+				context.fill();
+			}
+
+			context.fillStyle = ingredient.color.toString();
+			context.beginPath();
+			context.moveTo(0, height);
+			for (let [index, point] of wave.toReversed().entries()) {
+				context.lineTo(canvas.width / this.liquidResolution * index, height + point - this.wavelength * 2);
+			}
+			context.lineTo(canvas.width, canvas.height);
+			context.lineTo(0, canvas.height);
+			context.fill();
+
+			ingredientIndex++;
+		}
+
+		return canvas;
+	}
 }
