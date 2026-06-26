@@ -10,5 +10,9 @@ export type IngredientInfo = {
 };
 
 type IngredientEffects = {
-	explodesWhenMixedWith?: IngredientId[];
+	cannotBeMixedWith?: IngredientId[];
+	tempratureRange?: {
+		min?: number;
+		max?: number;
+	}
 };

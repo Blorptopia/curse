@@ -354,11 +354,18 @@ export class GameElement extends LitElement {
 			<dd class="price" ?data-can-afford=${this.balance >= ingredient.price}>${ingredient.price}$</dd>
 	   	`);
 
-		if (ingredient.effects.explodesWhenMixedWith !== undefined) {
+		if (ingredient.effects.cannotBeMixedWith !== undefined) {
 			factFragments.push(html`
-				<dt>Explodes when mixed with</dt>
-				${ingredient.effects.explodesWhenMixedWith?.map(ingredientId => html`<dd>${INGREDIENTS[ingredientId].name}</dd>`)}
+				<dt>Cannot be mixed with</dt>
+				${ingredient.effects.cannotBeMixedWith?.map(ingredientId => html`<dd>${INGREDIENTS[ingredientId].name}</dd>`)}
 			`);
+		}
+		if (ingredient.effects.tempratureRange !== undefined) {
+			factFragments.push(html`
+				<dt>Temperature range</dt>
+				${ingredient.effects.tempratureRange.min !== undefined ? html`<dd>Min ${ingredient.effects.tempratureRange.min} &deg;C</dd>` : null}
+				${ingredient.effects.tempratureRange.max !== undefined ? html`<dd>Max ${ingredient.effects.tempratureRange.max} &deg;C</dd>` : null}
+		   	`);
 		}
 
 		return html`

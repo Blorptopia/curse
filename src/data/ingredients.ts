@@ -12,7 +12,7 @@ const RED_PILL: IngredientInfo = {
 	name: "Red pill",
 	description: "Mmm tasty",
 	effects: {
-		explodesWhenMixedWith: ["RED_PILL", "BLUE_PILL"]
+		cannotBeMixedWith: ["RED_PILL", "BLUE_PILL"]
 	},
 	price: 80,
 	color: Color("#ff0000"),
@@ -21,6 +21,10 @@ const BURGER: IngredientInfo = {
 	name: "Burger",
 	description: "One who burgs",
 	effects: {
+		tempratureRange: {
+			min: 5,
+			max: 20
+		}
 	},
 	price: 10,
 	color: Color("#d2408e"),
