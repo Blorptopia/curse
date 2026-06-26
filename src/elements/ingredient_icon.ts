@@ -3,13 +3,13 @@ import { customElement, property, query } from "lit/decorators.js";
 import type { IngredientId } from "../types/ingredient";
 import BurgerURL from "../assets/ingredients/burger.png";
 import FlatBurgerURL from "../assets/ingredients/flat_burger.png";
+import EggURL from "../assets/ingredients/egg.png";
 import type { PlaceIngredientData } from "../types/place";
 
 const INGREDIENT_TO_IMAGES = {
-	BLUE_PILL: "",
-	RED_PILL: "",
 	BURGER: BurgerURL,
-	FLAT_BURGER: FlatBurgerURL
+	FLAT_BURGER: FlatBurgerURL,
+	EGG: EggURL
 } satisfies Record<IngredientId, string>;
 
 @customElement("curse-ingredient-icon")

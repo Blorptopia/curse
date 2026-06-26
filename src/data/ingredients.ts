@@ -1,26 +1,11 @@
 import Color from "color";
 import type { IngredientInfo } from "../types/ingredient";
 
-const BLUE_PILL: IngredientInfo = {
-	name: "Blue pill",
-	description: "Oh no not again",
-	effects: {},
-	price: 50,
-	color: Color("#0000ff"),
-};
-const RED_PILL: IngredientInfo = {
-	name: "Red pill",
-	description: "Mmm tasty",
-	effects: {
-		cannotBeMixedWith: ["RED_PILL", "BLUE_PILL"]
-	},
-	price: 80,
-	color: Color("#ff0000"),
-};
 const BURGER: IngredientInfo = {
 	name: "Burger",
 	description: "One who burgs",
 	effects: {
+		cannotBeMixedWith: ["FLAT_BURGER"]
 	},
 	price: 40,
 	color: Color("#d2408e"),
@@ -29,6 +14,7 @@ const FLAT_BURGER: IngredientInfo = {
 	name: "Burger (flat)",
 	description: "Who sat on the burger :(",
 	effects: {
+		cannotBeMixedWith: ["BURGER"]
 	},
 	price: 10,
 	color: Color("#ae3ed1"),
@@ -69,8 +55,6 @@ const CHICKEN: IngredientInfo = {
 	color: Color("#ae3ed1"),
 };
 export const INGREDIENTS = {
-	BLUE_PILL,
-	RED_PILL,
 	BURGER,
 	FLAT_BURGER,
 	CRAB,
