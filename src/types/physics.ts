@@ -11,4 +11,5 @@ export type PhysicsUserData = {
 		hh: number;
 	};
 	entityId?: string;
+	role?: "hot_plate";
 };

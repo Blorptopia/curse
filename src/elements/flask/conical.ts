@@ -7,6 +7,10 @@ import type { IngredientId } from "../../types/ingredient";
 import type { IngredientInstance } from "../../types/flask";
 import MaskImageURL from "../../assets/flask/conical/mask.png?url";
 import { INGREDIENTS } from "../../data/ingredients";
+import { hotPlateActivatedContext } from "../../lib/context";
+import { consume } from "@lit/context";
+
+const BASELINE_TEMPERATURE = 20;
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {
@@ -17,6 +21,13 @@ export class ConicalFlaskBaseElement extends LitElement {
 	public disabled: boolean;
 	@property({type: Number})
 	public angleRad: number;
+	@property({type: Boolean})
+	public onHotPlate: boolean;
+	@property({type: Number})
+	public temperature: number;
+	@consume({context: hotPlateActivatedContext, subscribe: true})
+	@property({type: Boolean})
+	public hotPlateActivated: boolean;
 
 	// Elements
 	@query("img")
@@ -30,6 +41,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 
 	// Attributes
 	private renderTask: Task<[HTMLCanvasElement | undefined, boolean], void>;
+	private updateTemperatureTask: Task<[boolean], void>;
 
 	private liquidResolution: number;
 	private maxLiquid: number;
@@ -40,6 +52,9 @@ export class ConicalFlaskBaseElement extends LitElement {
 		this.angleRad = 0;
 		this.shouldBeDraggable = true;
 		this.disabled = false;
+		this.onHotPlate = false;
+		this.temperature = 20;
+		this.hotPlateActivated = false;
 
 		this.instances = {};
 
@@ -71,6 +86,29 @@ export class ConicalFlaskBaseElement extends LitElement {
 			},
 			args: () => [this.canvasElement, this.disabled] as const
 		});
+		this.updateTemperatureTask = new Task(this, {
+			task: async ([disabled], {signal}) => {
+				if (disabled) {
+					return;
+				}
+				while (!signal.aborted) {
+
+					if (this.onHotPlate) {
+						await new Promise<void>(resolve => setTimeout(resolve, 300));
+						this.temperature += 3;
+					} else {
+						await new Promise<void>(resolve => setTimeout(resolve, 500));
+						this.temperature -= 1;
+					}
+					this.temperature = Math.max(BASELINE_TEMPERATURE, this.temperature);
+					console.log(`set temperature to ${this.temperature}`);
+
+					const event = new CustomEvent("cursetemperaturechange");
+					this.dispatchEvent(event);
+				}
+			},
+			args: () => [this.disabled] as const
+		})
 		this.liquidResolution = 20;
 		this.wavelength = 10;
 		this.maxLiquid = 10;

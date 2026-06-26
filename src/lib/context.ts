@@ -14,3 +14,4 @@ export type PhysicsContext = {
 };
 
 export const physicsContext = createContext<PhysicsContext | undefined>(Symbol("physics"));
+export const hotPlateActivatedContext = createContext<boolean>(Symbol("hotPlateActivated"));

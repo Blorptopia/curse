@@ -18,9 +18,9 @@ import type { IngredientId } from "../types/ingredient";
 import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
 import { consume } from "@lit/context";
-import { physicsContext, type PhysicsContext } from "../lib/physics_context";
+import { physicsContext, type PhysicsContext } from "../lib/context";
 import { type ImpulseJoint, type RigidBody, type Collider, Vector2, TempContactForceEvent } from "@dimforge/rapier2d-compat";
-import type { HotPlateElement } from "./hot_plate";
+import { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import type { BoundingBox, PhysicsUserData } from "../types/physics";
 import type { GameEntity } from "../types/entity";
@@ -50,9 +50,13 @@ export class GameElement extends LitElement {
 	private productPurchaseCount: Partial<Record<ItemId | IngredientId, number>>;
 	@state()
 	private balance: number;
+	@state()
+	private flasksOnHotPlate: string[];
+	@state()
+	private flaskTempratures: Partial<Record<string, string>>;
 
 	// Attributes
-	private constantColliders: Collider[];
+	private constantRigidBodies: RigidBody[];
 	private entities: Partial<Record<string, GameEntity>>;
 	private cursorRigidBody?: RigidBody;
 	private cursorJoint?: ImpulseJoint;
@@ -73,8 +77,10 @@ export class GameElement extends LitElement {
 		this.dialogIndex = 0;
 		this.productPurchaseCount = {};
 		this.balance = 500;
+		this.flasksOnHotPlate = [];
+		this.flaskTempratures = {};
 		
-		this.constantColliders = [];
+		this.constantRigidBodies = [];
 		this.entities = {};
 
 		// We only care about it for state updates
@@ -177,6 +183,13 @@ export class GameElement extends LitElement {
 						if (item.itemId === "CONICAL_FLASK") {
 							visualElement = document.createElement("curse-conical-flask");
 							visualElement.shouldBeDraggable = false;
+
+							visualElement.addEventListener("cursetemperaturechange", () => {
+								this.flaskTempratures = {
+									...this.flaskTempratures,
+									[entityId]: visualElement!.temperature
+								}
+							});
 
 							const topSensorCollider = this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(halfWidthWorld / 2, 0.01), rigidBody);
 							topSensorCollider.setTranslationWrtParent({x: 0, y: -halfHeightWorld});
@@ -302,7 +315,7 @@ export class GameElement extends LitElement {
 				<div id="left-window" class="window"></div>
 				<div id="right-window" class="window"></div>
 
-				${this.orders.length === 0 ? this.renderCustomer(this.dayIndex === 0 ? "LOANS_HARK_PRE_EXPLOSION" : "LOANS_HARK", 0) : null}
+				${this.orders.length === 0 ? this.renderCustomer("LOANS_HARK", "pre-explosion", 0) : null}
 				${map(this.orders, (order, index) => this.renderCustomer(order.customer.id, order.customer.pose, index))}
 				${this.renderDialog()}
 				<div id="entities-container"></div>
@@ -656,22 +669,24 @@ export class GameElement extends LitElement {
 			return;
 		}
 
-		for (const constantCollider of this.constantColliders) {
-			physics.world.removeCollider(constantCollider, true);
+		for (const rigidBody of this.constantRigidBodies) {
+			physics.world.removeRigidBody(rigidBody);
 		}
-		this.constantColliders = [];
-
-		const constantColliderElements: HTMLElement[] = [
-			this.hotPlateElement
-		].filter(element => element !== undefined);
+		this.constantRigidBodies = [];
 		
-		for (const colldierElement of constantColliderElements) {
-			const box = this.createGameBoundsForElement(colldierElement, physics);
-			const collider = physics.world.createCollider(physics.rapier.ColliderDesc.cuboid(box.hw, box.hh));
-			collider.setTranslation({x: box.x, y: box.y});
-			this.constantColliders.push(collider);
-		}
+		// Hot plate
+		const hotPlateRigidBody = physics.world.createRigidBody(physics.rapier.RigidBodyDesc.fixed());
+		hotPlateRigidBody.userData = {
+			role: "hot_plate"
+		} satisfies PhysicsUserData;
+		const hotPlateBox = this.createGameBoundsForElement(this.hotPlateElement, physics);
+		hotPlateRigidBody.setTranslation({x: hotPlateBox.x, y: hotPlateBox.y}, true);
+		this.constantRigidBodies.push(hotPlateRigidBody);
+		physics.world.createCollider(physics.rapier.ColliderDesc.cuboid(hotPlateBox.hw, hotPlateBox.hh), hotPlateRigidBody);
 
+		const hotPlateSensor = physics.world.createCollider(physics.rapier.ColliderDesc.cuboid(hotPlateBox.hw, 0.1), hotPlateRigidBody);
+		hotPlateSensor.setSensor(true);
+		hotPlateSensor.setActiveEvents(1);
 	}
 	private createGameBoundsForElement(element: HTMLElement, physics: PhysicsContext): BoundingBox {
 		let rect = element.getBoundingClientRect();
@@ -694,23 +709,21 @@ export class GameElement extends LitElement {
 	}
 	public handleCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
 		console.log("game got collision event");
-		if (!started) {
-			console.log("ignoring - not started");
-			return;
-		}
-		const rigidBody1 = collider1.parent();
-		const rigidBody2 = collider2.parent();
 		
-		this.handlePlaceItemCollisionEvent(rigidBody1, rigidBody2);
+		this.handlePlaceItemCollisionEvent(collider1, collider2, started);
+		this.handleHotPlateCollisionEvent(collider1, collider2, started);
 
 	}
-	private handlePlaceItemCollisionEvent(rigidBody1: RigidBody | null, rigidBody2: RigidBody | null): void {
+	private handlePlaceItemCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
+		const rigidBody1 = collider1.parent();
+		const rigidBody2 = collider2.parent();
+		if (!started) {
+			return;
+		}
 		if (rigidBody1 === null || rigidBody2 === null) {
-			console.log("ignoring - no parent");
 			return;
 		}
 		if (this.physics === undefined) {
-			console.log("no physics - ignoring event");
 			return;
 		}
 		const userData1 = rigidBody1.userData as PhysicsUserData | undefined;
@@ -720,7 +733,6 @@ export class GameElement extends LitElement {
 		const entity2Id = userData2?.entityId;
 
 		if (entity1Id === undefined || entity2Id === undefined) {
-			console.log("ignoring - no entity id");
 			return;
 		}
 
@@ -781,6 +793,53 @@ export class GameElement extends LitElement {
 		}
 		if (entity.element instanceof ConicalFlaskBaseElement) {
 			entity.element.registerCrash(magnitude);
+		}
+
+	}
+	private handleHotPlateCollisionEvent(collider1: Collider, collider2: Collider, started: boolean): void {
+		const rigidBody1 = collider1.parent();
+		const rigidBody2 = collider2.parent();
+		if (rigidBody1 === null || rigidBody2 === null) {
+			console.log("ignoring - no parent");
+			return;
+		}
+		if (this.physics === undefined) {
+			console.log("no physics - ignoring event");
+			return;
+		}
+		const userData1 = rigidBody1.userData as PhysicsUserData | undefined;
+		const userData2 = rigidBody2.userData as PhysicsUserData | undefined;
+
+		const entity1Id = userData1?.entityId;
+		const entity2Id = userData2?.entityId;
+
+		const entity1Role = userData1?.role;
+		const entity2Role = userData2?.role;
+
+		if (entity1Id !== undefined && entity2Role === "hot_plate") {
+			const entity1 = this.entities[entity1Id]!;
+			if (!(entity1.element instanceof ConicalFlaskBaseElement)) {
+				console.log("not hot :(", entity1.element);
+				return;
+			}
+			if (started) {
+				this.flasksOnHotPlate.push(entity1Id);
+			} else {
+				this.flasksOnHotPlate = this.flasksOnHotPlate.filter(id => id !== entity1Id);
+			}
+			entity1.element.onHotPlate = started;
+		}
+		if (entity1Role === "hot_plate" && entity2Id !== undefined) {
+			const entity2 = this.entities[entity2Id]!;
+			if (!(entity2.element instanceof ConicalFlaskBaseElement)) {
+				return;
+			}
+			entity2.element.onHotPlate = started;
+			if (started) {
+				this.flasksOnHotPlate.push(entity2Id);
+			} else {
+				this.flasksOnHotPlate = this.flasksOnHotPlate.filter(id => id !== entity2Id);
+			}
 		}
 
 	}

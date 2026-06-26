@@ -2,7 +2,7 @@ import { provide } from "@lit/context";
 import { Task } from "@lit/task";
 import { css, html, LitElement, type CSSResultGroup, type HTMLTemplateResult, type PropertyValues } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
-import { physicsContext, type PhysicsContext, type Rapier } from "../lib/physics_context";
+import { physicsContext, type PhysicsContext, type Rapier } from "../lib/context";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import { PHYSICS_DEBUG, PHYSICS_DEBUG_RES, STAND_HEIGHT_METERS } from "../config";
 import type { Collider, World } from "@dimforge/rapier2d-compat";
