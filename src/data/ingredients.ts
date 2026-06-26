@@ -41,9 +41,26 @@ const FLAT_BURGER: IngredientInfo = {
 	price: 10,
 	color: Color("#ae3ed1"),
 };
+const CRAB: IngredientInfo = {
+	name: "Crab",
+	description: "A fearless red tank",
+	effects: {
+		tempratureRange: {
+			min: 60,
+			max: 80
+		},
+		consumesIngredient: {
+			ingredient: "BURGER",
+			every: 5
+		}
+	},
+	price: 50,
+	color: Color("#ae3ed1"),
+};
 export const INGREDIENTS = {
 	BLUE_PILL,
 	RED_PILL,
 	BURGER,
-	FLAT_BURGER
+	FLAT_BURGER,
+	CRAB
 } as const;

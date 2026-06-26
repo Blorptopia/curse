@@ -10,7 +10,7 @@ import { INGREDIENTS } from "../../data/ingredients";
 import { hotPlateActivatedContext } from "../../lib/context";
 import { consume } from "@lit/context";
 
-const BASELINE_TEMPERATURE = 20;
+export const BASELINE_TEMPERATURE = 20;
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {

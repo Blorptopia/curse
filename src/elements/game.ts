@@ -26,7 +26,7 @@ import type { BoundingBox, PhysicsUserData } from "../types/physics";
 import type { GameEntity } from "../types/entity";
 import { Task } from "@lit/task";
 import type { PlaceIngredientData, PlaceItemData } from "../types/place";
-import { ConicalFlaskBaseElement } from "./flask/conical";
+import { BASELINE_TEMPERATURE, ConicalFlaskBaseElement } from "./flask/conical";
 import { IngredientIconElement } from "./ingredient_icon";
 import { ifDefined } from "lit/directives/if-defined.js";
 
@@ -327,7 +327,7 @@ export class GameElement extends LitElement {
 				<div id="entities-container"></div>
 				<div id="hot-plate-container">
 					<curse-hot-plate
-						.temperatures=${this.flasksOnHotPlate.map(entityId => this.flaskTemperatures[entityId])}
+						.temperatures=${this.flasksOnHotPlate.map(entityId => this.flaskTemperatures[entityId] ?? BASELINE_TEMPERATURE)}
 						@curseenablehotplate=${() => this.hotPlateActive = true}
 						@cursedisablehotplate=${() => this.hotPlateActive = false}
 					></curse-hot-plate>
@@ -662,7 +662,7 @@ export class GameElement extends LitElement {
 		return 550;
 	}
 	private getIngredientsForDay(): IngredientId[] {
-		return Object.keys(INGREDIENTS);
+		return Object.keys(INGREDIENTS) as IngredientId[];
 	}
 	protected willUpdate(changedProperties: PropertyValues): void {
 	    super.willUpdate(changedProperties);

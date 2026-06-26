@@ -14,5 +14,9 @@ type IngredientEffects = {
 	tempratureRange?: {
 		min?: number;
 		max?: number;
+	};
+	consumesIngredient?: {
+		ingredient: IngredientId;
+		every: number;
 	}
 };
