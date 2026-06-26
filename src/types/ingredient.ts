@@ -16,7 +16,7 @@ type IngredientEffects = {
 		max?: number;
 	};
 	consumesIngredient?: {
-		ingredient: IngredientId;
+		ingredientId: IngredientId;
 		every: number;
 	};
 	crash?: {

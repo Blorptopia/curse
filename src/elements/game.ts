@@ -374,6 +374,18 @@ export class GameElement extends LitElement {
 				${ingredient.effects.tempratureRange.max !== undefined ? html`<dd>Max ${ingredient.effects.tempratureRange.max} &deg;C</dd>` : null}
 		   	`);
 		}
+		if (ingredient.effects.consumesIngredient !== undefined) {
+			factFragments.push(html`
+				<dt>Consumes ingredient</dt>
+				<dd>Consumes a ${INGREDIENTS[ingredient.effects.consumesIngredient.ingredientId].name} every ${ingredient.effects.consumesIngredient.every} seconds</dd>
+		   	`);
+		}
+		if (ingredient.effects.crash !== undefined) {
+			factFragments.push(html`
+				<dt>Mixing</dt>
+				<dd>Needs to be crashed into a wall at least every ${ingredient.effects.crash.every} seconds</dd>
+		   	`);
+		}
 
 		return html`
 			<div

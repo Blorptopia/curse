@@ -24,7 +24,7 @@ const CRAB: IngredientInfo = {
 	description: "A fearless red tank",
 	effects: {
 		consumesIngredient: {
-			ingredient: "BURGER",
+			ingredientId: "BURGER",
 			every: 5
 		}
 	},
@@ -47,7 +47,7 @@ const CHICKEN: IngredientInfo = {
 	description: "Well that's one way to end the debate",
 	effects: {
 		consumesIngredient: {
-			ingredient: "EGG",
+			ingredientId: "EGG",
 			every: 20
 		}
 	},
