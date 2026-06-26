@@ -4,6 +4,10 @@ import type { CustomerId } from "../types/customer";
 
 import JackDefaultURL from "../assets/customers/jack/poses/default.png";
 import JoanyDefaultURL from "../assets/customers/joany/poses/default.png";
+import TimTomDefaultURL from "../assets/customers/tim_tom/poses/default.png";
+import OleMartinssonDefaultURL from "../assets/customers/ole_martinsson/poses/default.png";
+import WhichyVequliaDefaultURL from "../assets/customers/whicky_vequlia/poses/default.png";
+
 
 const ID_TO_IMAGES = {
 	JACK: {
@@ -11,7 +15,19 @@ const ID_TO_IMAGES = {
 	},
 	JOANY: {
 		default: JoanyDefaultURL
-	}
+	},
+	TIM_TOM: {
+		default: TimTomDefaultURL,
+	},
+	LOANS_HARK: {
+		default: "",
+	},
+	OLE_MARTINSSON: {
+		default: OleMartinssonDefaultURL,
+	},
+	WHICKY_VEQUILIA: {
+		default: WhichyVequliaDefaultURL
+	},
 } satisfies Record<CustomerId, Record<string, string>>;
 
 @customElement("curse-customer-portrait")
@@ -23,7 +39,7 @@ export class CustomerPortraitElement extends LitElement {
 
 	public constructor() {
 		super();
-		this.customerId = "GUSTAVO";
+		this.customerId = "JACK";
 		this.pose = "default";
 	}
 	protected render(): HTMLTemplateResult {

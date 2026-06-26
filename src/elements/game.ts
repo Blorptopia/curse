@@ -19,7 +19,7 @@ import type { ItemId } from "../types/item";
 import { ITEMS } from "../data/items";
 import { consume, provide } from "@lit/context";
 import { hotPlateActivatedContext, physicsContext, type PhysicsContext } from "../lib/context";
-import { type ImpulseJoint, type RigidBody, type Collider, Vector2, TempContactForceEvent } from "@dimforge/rapier2d-compat";
+import type { ImpulseJoint, RigidBody, Collider, TempContactForceEvent } from "@dimforge/rapier2d-compat";
 import { HotPlateElement } from "./hot_plate";
 import { ResizeController } from "@lit-labs/observers/resize-controller.js";
 import type { BoundingBox, PhysicsUserData } from "../types/physics";

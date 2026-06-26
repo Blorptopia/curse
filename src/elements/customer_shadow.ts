@@ -3,10 +3,19 @@ import { customElement, property } from "lit/decorators.js";
 import type { CustomerId } from "../types/customer";
 
 import JackShadowURL from "../assets/customers/jack/shadow.png";
+// import JoanyShadowURL from "../assets/customers/joany/shadow.png";
+import TimTomShadowURL from "../assets/customers/tim_tom/shadow.png";
+import OleMartinssonShadowURL from "../assets/customers/ole_martinsson/shadow.png";
+import WhichyVequliaShadowURL from "../assets/customers/whicky_vequlia/shadow.png";
 
 const ID_TO_IMAGES = {
-	GUSTAVO: "",
-	JACK: JackShadowURL
+	JACK: JackShadowURL,
+	// JOANY: JoanyShadowURL,
+	JOANY: "",
+	TIM_TOM: TimTomShadowURL,
+	LOANS_HARK: "",
+	OLE_MARTINSSON: OleMartinssonShadowURL,
+	WHICKY_VEQUILIA: WhichyVequliaShadowURL 
 } satisfies Record<CustomerId, string>;
 
 @customElement("curse-customer-shadow")
@@ -16,7 +25,7 @@ export class CustomerShadowElement extends LitElement {
 
 	public constructor() {
 		super();
-		this.customerId = "GUSTAVO";
+		this.customerId = "JACK";
 	}
 	protected render(): HTMLTemplateResult {
 		const imageUrl = ID_TO_IMAGES[this.customerId];
