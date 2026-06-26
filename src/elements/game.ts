@@ -570,7 +570,7 @@ export class GameElement extends LitElement {
 						<h1>${CUSTOMER_ID_TO_NAME[activeOrder.customer.id]}</h1>
 						<div id="order-ingredients">
 							${repeat(activeOrder.requiredIngredients, ingredientId => ingredientId, ingredientId => html`
-								<curse-ingredient-icon .ingredientId=${ingredientId}></curse-ingredient-icon>
+								<curse-ingredient-icon .ingredientId=${ingredientId} title=${INGREDIENTS[ingredientId].name}></curse-ingredient-icon>
 							 `)}
 						</div>
 					</div>
@@ -769,6 +769,7 @@ export class GameElement extends LitElement {
 				requiredIngredients: ["EGG"],
 				baseValue: LORE_MULTIPLIER
 			},
+			// Day 4
 			{
 				description: [
 					"Great weather we are having adult! I just came from work and gave a kiss to my beautiful wife! Could I get ONE fly potion. To ONE man?",
@@ -785,7 +786,6 @@ export class GameElement extends LitElement {
 			templates.push(RONNY_INTERACTIONS[0]);
 			templates.push(JACK_INTERACTIONS[0]);
 			templates.push(TIM_TOM_INTERACTIONS[0]);
-			templates.push(RONNY_INTERACTIONS[1]);
 		}
 		if (this.dayIndex === 1) {
 			templates.push(TIM_TOM_INTERACTIONS[1]);
@@ -798,7 +798,7 @@ export class GameElement extends LitElement {
 			templates.push(WHICKY_INTERACTIONS[0]);
 		}
 		if (this.dayIndex === 3) {
-
+			templates.push(RONNY_INTERACTIONS[1]);
 		}
 		if (this.dayIndex === 5) {
 			templates.push(WHICKY_INTERACTIONS[1]);
