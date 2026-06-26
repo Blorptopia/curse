@@ -2,12 +2,14 @@ import { type HTMLTemplateResult, LitElement, html, type CSSResultGroup, css } f
 import { customElement, property, query } from "lit/decorators.js";
 import type { IngredientId } from "../types/ingredient";
 import BurgerURL from "../assets/ingredients/burger.png";
+import FlatBurgerURL from "../assets/ingredients/flat_burger.png";
 import type { PlaceIngredientData } from "../types/place";
 
 const INGREDIENT_TO_IMAGES = {
 	BLUE_PILL: "",
 	RED_PILL: "",
-	BURGER: BurgerURL
+	BURGER: BurgerURL,
+	FLAT_BURGER: FlatBurgerURL
 } satisfies Record<IngredientId, string>;
 
 @customElement("curse-ingredient-icon")

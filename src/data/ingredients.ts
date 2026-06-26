@@ -26,11 +26,24 @@ const BURGER: IngredientInfo = {
 			max: 20
 		}
 	},
-	price: 10,
+	price: 40,
 	color: Color("#d2408e"),
+};
+const FLAT_BURGER: IngredientInfo = {
+	name: "Burger (flat)",
+	description: "Who sat on the burger :(",
+	effects: {
+		tempratureRange: {
+			min: 5,
+			max: 20
+		}
+	},
+	price: 10,
+	color: Color("#ae3ed1"),
 };
 export const INGREDIENTS = {
 	BLUE_PILL,
 	RED_PILL,
-	BURGER
+	BURGER,
+	FLAT_BURGER
 } as const;

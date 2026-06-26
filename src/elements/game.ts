@@ -662,10 +662,7 @@ export class GameElement extends LitElement {
 		return 550;
 	}
 	private getIngredientsForDay(): IngredientId[] {
-		if (this.dayIndex === 0) {
-			return ["BURGER"];
-		}
-		return ["RED_PILL", "BLUE_PILL"];
+		return Object.keys(INGREDIENTS);
 	}
 	protected willUpdate(changedProperties: PropertyValues): void {
 	    super.willUpdate(changedProperties);
