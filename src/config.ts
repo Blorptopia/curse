@@ -1,6 +1,6 @@
 import type { ObjectSizing } from "./types/sizing";
 
-export const MAX_ORDERS_PER_DAY = 7;
+export const MAX_ORDERS_PER_DAY = 5;
 export const CUSTOMER_SHADOW_SIZE: ObjectSizing = {
 	height: 207,
 	width: 66
@@ -13,3 +13,4 @@ export const IGNITION_OFFSET_MS: number = 175;
 export const PHYSICS_DEBUG: boolean = false;
 export const PHYSICS_DEBUG_RES: number = 500;
 export const STAND_HEIGHT_METERS = 1.5;
+export const FLASK_BASELINE_TEMPERATURE = 20;

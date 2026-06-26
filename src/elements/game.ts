@@ -26,7 +26,7 @@ import type { BoundingBox, PhysicsUserData } from "../types/physics";
 import type { GameEntity } from "../types/entity";
 import { Task } from "@lit/task";
 import type { PlaceIngredientData, PlaceItemData } from "../types/place";
-import { BASELINE_TEMPERATURE, ConicalFlaskBaseElement } from "./flask/conical";
+import { FLASK_BASELINE_TEMPERATURE, ConicalFlaskBaseElement } from "./flask/conical";
 import { IngredientIconElement } from "./ingredient_icon";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { CupElement } from "./cup";
@@ -359,7 +359,7 @@ export class GameElement extends LitElement {
 				<div id="entities-container"></div>
 				<div id="hot-plate-container">
 					<curse-hot-plate
-						.temperatures=${this.flasksOnHotPlate.map(entityId => this.flaskTemperatures[entityId] ?? BASELINE_TEMPERATURE)}
+						.temperatures=${this.flasksOnHotPlate.map(entityId => this.flaskTemperatures[entityId] ?? FLASK_BASELINE_TEMPERATURE)}
 						@curseenablehotplate=${() => this.hotPlateActive = true}
 						@cursedisablehotplate=${() => this.hotPlateActive = false}
 					></curse-hot-plate>

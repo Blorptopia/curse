@@ -9,8 +9,8 @@ import MaskImageURL from "../../assets/flask/conical/mask.png?url";
 import { INGREDIENTS } from "../../data/ingredients";
 import { hotPlateActivatedContext } from "../../lib/context";
 import { consume } from "@lit/context";
+import { FLASK_BASELINE_TEMPERATURE } from "../../config";
 
-export const BASELINE_TEMPERATURE = 20;
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {
@@ -95,7 +95,7 @@ export class ConicalFlaskBaseElement extends LitElement {
 						await new Promise<void>(resolve => setTimeout(resolve, 500));
 						this.temperature -= 1;
 					}
-					this.temperature = Math.max(BASELINE_TEMPERATURE, this.temperature);
+					this.temperature = Math.max(FLASK_BASELINE_TEMPERATURE, this.temperature);
 					console.log(`set temperature to ${this.temperature}`);
 
 					const event = new CustomEvent("cursetemperaturechange");
