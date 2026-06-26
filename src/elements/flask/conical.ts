@@ -46,7 +46,6 @@ export class ConicalFlaskBaseElement extends LitElement {
 	private liquidResolution: number;
 	private maxLiquid: number;
 	private wavelength: number;
-
 	public constructor() {
 		super();
 		this.angleRad = 0;
@@ -55,7 +54,6 @@ export class ConicalFlaskBaseElement extends LitElement {
 		this.onHotPlate = false;
 		this.temperature = 20;
 		this.hotPlateActivated = false;
-
 		this.instances = {};
 
 		this.renderTask = new Task(this, {
@@ -228,8 +226,10 @@ export class ConicalFlaskBaseElement extends LitElement {
 		const angleIncrement = (Math.PI * 2) / this.liquidResolution;
 		let wave: number[] = [];
 
+
 		for (let index = 0; index <= this.liquidResolution; index++) {
-			wave.push(Math.sin(angleIncrement * index) * this.wavelength);
+			let point = Math.sin(angleIncrement * index + Date.now() / 1000) * this.wavelength + Math.random() * (this.temperature - 20) / 10;
+			wave.push(point);
 		}
 
 		let ingredientIndex = 0;
