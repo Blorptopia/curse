@@ -31,10 +31,11 @@ import { IngredientIconElement } from "./ingredient_icon";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { CupElement } from "./cup";
 import { repeat } from "lit/directives/repeat.js";
-
 import FlaskKnock1 from "../assets/flask/conical/knock/1.wav";
 import FlaskKnock2 from "../assets/flask/conical/knock/2.wav";
 import FlaskKnock3 from "../assets/flask/conical/knock/3.wav";
+import FlaskBreak1 from "../assets/flask/conical/break/1.wav";
+import FlaskBreak2 from "../assets/flask/conical/break/2.wav";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 const CUSTOMER_DEATH_CHANCE: number = 0.1;
@@ -42,6 +43,10 @@ const FLASK_KNOCK_SOUND_URLS: string[] = [
 	FlaskKnock1,
 	FlaskKnock2,
 	FlaskKnock3
+];
+const FLASK_BREAK_SOUND_URLS: string[] = [
+	FlaskBreak1,
+	FlaskBreak2,
 ];
 
 @customElement("curse-game")
@@ -205,13 +210,24 @@ export class GameElement extends LitElement {
 						if (item.itemId === "CONICAL_FLASK") {
 							visualElement = document.createElement("curse-conical-flask");
 							visualElement.shouldBeDraggable = false;
-
+							
+							const abortController = new AbortController();
 							visualElement.addEventListener("cursetemperaturechange", () => {
 								this.flaskTemperatures = {
 									...this.flaskTemperatures,
 									[entityId]: visualElement!.temperature
+								};
+								if (visualElement!.temperature > 100) {
+									const audioURL = FLASK_BREAK_SOUND_URLS[Math.floor(Math.random() * FLASK_BREAK_SOUND_URLS.length)];
+									const audio = new Audio(audioURL);
+									audio.play();
+									visualElement!.remove();
+									this.physics?.world.removeRigidBody(rigidBody);
+									delete this.entities[entityId];
+									this.flasksOnHotPlate = this.flasksOnHotPlate.filter(flaskId => flaskId !== entityId);
+									abortController.abort();
 								}
-							});
+							}, {signal: abortController.signal});
 
 							const topSensorCollider = this.physics.world.createCollider(this.physics.rapier.ColliderDesc.cuboid(halfWidthWorld / 2, 0.01), rigidBody);
 							topSensorCollider.setTranslationWrtParent({x: 0, y: -halfHeightWorld});

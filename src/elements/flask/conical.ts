@@ -11,7 +11,6 @@ import { hotPlateActivatedContext } from "../../lib/context";
 import { consume } from "@lit/context";
 
 export const BASELINE_TEMPERATURE = 20;
-const PRICE_MULTIPLIER = 1.1;
 
 @customElement("curse-conical-flask")
 export class ConicalFlaskBaseElement extends LitElement {
