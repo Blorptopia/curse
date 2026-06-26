@@ -716,7 +716,7 @@ export class GameElement extends LitElement {
 					customer: {
 						id: "WHICKY_VEQUILIA"
 					},
-					requiredIngredients: ["CRAB", "EGG"],
+					requiredIngredients: ["SHEEP"],
 					baseValue: LORE_MULTIPLIER
 				},
 				{
@@ -815,7 +815,7 @@ export class GameElement extends LitElement {
 					customer: {
 						id: "JACK",
 					},
-					requiredIngredients: ["BURGER"],
+					requiredIngredients: ["BURGER", "SHEEP"],
 					baseValue: LORE_MULTIPLIER
 				},
 				{

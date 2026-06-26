@@ -128,7 +128,16 @@ const FLYING_OINTMENT: IngredientInfo = {
 	},
 	price: 100,
 	color: Color("#7c4289"),
+}
+const SHEEP: IngredientInfo = {
+	name: "Sheep",
+	description: "Meow?",
+	effects: {
+	},
+	price: 100,
+	color: Color("#ccc"),
 };
+
 export const INGREDIENTS = {
 	BURGER,
 	FLAT_BURGER,
@@ -143,5 +152,6 @@ export const INGREDIENTS = {
 	UNICORN_HORN,
 	MONKEY_BRAIN,
 	BEAST_ENERGY,
-	FLYING_OINTMENT
+	FLYING_OINTMENT,
+	SHEEP
 } as const;
