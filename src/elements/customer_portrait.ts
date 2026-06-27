@@ -7,7 +7,7 @@ import JoanyDefaultURL from "../assets/customers/joany/poses/default.png";
 import TimTomDefaultURL from "../assets/customers/tim_tom/poses/default.png";
 import OleMartinssonDefaultURL from "../assets/customers/ole_martinsson/poses/default.png";
 import WhichyVequliaDefaultURL from "../assets/customers/whicky_vequlia/poses/default.png";
-import JonJodunDefaultURL from "../assets/customers/whicky_vequlia/poses/default.png";
+import JonJodunDefaultURL from "../assets/customers/jon_jodun/poses/default.png";
 import LoansHarkDefaultURL from "../assets/customers/loans_hark/poses/default.png";
 
 
