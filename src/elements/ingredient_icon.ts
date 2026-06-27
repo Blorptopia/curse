@@ -15,6 +15,7 @@ import BeastEnergyURL from "../assets/ingredients/beast_energy.png";
 import ChickenURL from "../assets/ingredients/chicken.png";
 import MonkeyBrainURL from "../assets/ingredients/monkey_brain.png";
 import FlyingOintmentURL from "../assets/ingredients/flying_ointment.png";
+import SheepURL from "../assets/ingredients/sheep.png";
 import type { PlaceIngredientData } from "../types/place";
 
 const INGREDIENT_TO_IMAGES = {
@@ -32,6 +33,7 @@ const INGREDIENT_TO_IMAGES = {
 	CHICKEN: ChickenURL,
 	CRAB: CrabURL,
 	FLYING_OINTMENT: FlyingOintmentURL,
+	SHEEP: SheepURL
 } satisfies Record<IngredientId, string>;
 
 @customElement("curse-ingredient-icon")

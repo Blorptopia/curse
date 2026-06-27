@@ -302,7 +302,8 @@ export class ConicalFlaskBaseElement extends LitElement {
 			const ingredient = INGREDIENTS[instance.ingredientId];
 			let instanceValue = 0;
 			// Positive effects
-			instanceValue += ingredient.price * Math.min(1, instance.mixedFraction);
+			const mixedFraction = Math.min(instance.totalRotation / FLASK_REQUIRED_ROTATION, 1);
+			instanceValue += ingredient.price * mixedFraction;
 
 			// Dual sided
 			let heatMultiplier = 1;
@@ -321,8 +322,6 @@ export class ConicalFlaskBaseElement extends LitElement {
 			instanceValue -= wronglyHeatedFraction * ingredient.price * 0.5;
 			value += instanceValue;
 
-			const mixedFraction = Math.min(instance.totalRotation / FLASK_REQUIRED_ROTATION, 1);
-			instanceValue -= mixedFraction * ingredient.price * 0.25;
 		}
 
 		this.instances = {};
