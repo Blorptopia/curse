@@ -556,6 +556,7 @@ export class GameElement extends LitElement {
 								class="primary"
 								type="button"
 								@click=${() => {
+									this.balance += this.valueFromPotion!;
 									this.valueFromPotion = undefined;
 									this.orders = this.orders.slice(1);
 								}}
