@@ -3,4 +3,8 @@
 	color-scheme: dark;
 	--size-multiplier: 0.1rem;
 	--wall-color: #775079;
+
+	--popup-background-color: #fdebfc;
+	--text-color: #dd5ee9;
+	--button-background-color: #c15df0;
 }

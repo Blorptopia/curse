@@ -655,6 +655,7 @@ export class GameElement extends LitElement {
 				<p>${dialogSet[this.dialogIndex]}</p>
 				<div id="actions">
 					<button
+						class="primary"
 						?hidden=${!hasMorePages}
 						@click=${() => this.dialogIndex++}
 					>Next</button>
@@ -1274,7 +1275,7 @@ export class GameElement extends LitElement {
 			right: 1rem;
 			padding: 1rem;
 			background: black;
-			color: green;
+			color: var(--text-color);
 			font-weight: bold;
 			font-size: 2rem;
 		}
@@ -1383,8 +1384,8 @@ export class GameElement extends LitElement {
 			position-area: top right;
 
 			padding: 1rem;
-			background: white;
-			color: black;
+			background: var(--popup-background-color);
+			color: var(--text-color);
 			border-radius: .75rem;
 
 			user-select: none;
@@ -1466,6 +1467,22 @@ export class GameElement extends LitElement {
 			object-position: bottom center;
 
 			image-rendering: pixelated;
+		}
+		button {
+			border: 0;
+			border-radius: 1rem;
+		}
+		.primary {
+			padding: 1rem;
+			background: var(--button-background-color);
+			color: white;
+		}
+		.destructive {
+			padding: 1rem;
+			background: red;
+			color: white;
+			border: 0;
+			border-radius: 1rem;
 		}
 	`;
 }
