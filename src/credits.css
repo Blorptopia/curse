@@ -1,0 +1,19 @@
+.link-button {
+	text-decoration: none;
+	color: inherit;
+	padding: 1rem;
+	border-radius: .25rem;
+
+	font-size: 2rem;
+}
+.primary {
+	background: #875f90;
+}
+.primary:hover {
+	background: #773a7c;
+}
+
+body {
+	font-size: 1.2rem;
+	line-height: 1.2;
+}
