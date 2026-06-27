@@ -36,6 +36,7 @@ import FlaskKnock2 from "../assets/flask/conical/knock/2.wav";
 import FlaskKnock3 from "../assets/flask/conical/knock/3.wav";
 import FlaskBreak1 from "../assets/flask/conical/break/1.wav";
 import FlaskBreak2 from "../assets/flask/conical/break/2.wav";
+import BackgroundURL from "../assets/background.png";
 
 const RANDOM_VALUE_VARIATION: number = 0.1;
 const CUSTOMER_DEATH_CHANCE: number = 0.1;
@@ -151,6 +152,11 @@ export class GameElement extends LitElement {
 
 	protected render(): HTMLTemplateResult {
 		return html`
+			<img
+				id="background"
+				src=${BackgroundURL}
+				alt=""
+			>
 			<div
 				id="window-frame"
 				@dragover=${(event: DragEvent) => {
@@ -1447,6 +1453,18 @@ export class GameElement extends LitElement {
 			--size: 1rem;
 			height: var(--size);
 			width: var(--size);
+		}
+		#background {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			z-index: -50000;
+			object-fit: cover;
+			object-position: bottom center;
+
+			image-rendering: pixelated;
 		}
 	`;
 }
