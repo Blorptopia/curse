@@ -680,7 +680,7 @@ export class GameElement extends LitElement {
 						}}
 					>Pay ${payment}$</button>
 					<button
-						class="dangerous"
+						class="destructive"
 						?hidden=${hasMorePages || this.dayIndex === 0}
 						@click=${() => {
 							location.href = "/game-over";
