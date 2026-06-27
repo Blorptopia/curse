@@ -8,6 +8,7 @@ import TimTomDefaultURL from "../assets/customers/tim_tom/poses/default.png";
 import OleMartinssonDefaultURL from "../assets/customers/ole_martinsson/poses/default.png";
 import WhichyVequliaDefaultURL from "../assets/customers/whicky_vequlia/poses/default.png";
 import JonJodunDefaultURL from "../assets/customers/whicky_vequlia/poses/default.png";
+import LoansHarkDefaultURL from "../assets/customers/loans_hark/poses/default.png";
 
 
 const ID_TO_IMAGES = {
@@ -21,7 +22,7 @@ const ID_TO_IMAGES = {
 		default: TimTomDefaultURL,
 	},
 	LOANS_HARK: {
-		default: "",
+		default: LoansHarkDefaultURL,
 	},
 	OLE_MARTINSSON: {
 		default: OleMartinssonDefaultURL,
