@@ -10,7 +10,7 @@ export const CUSTOMER_PORTRAIT_SIZE: ObjectSizing = {
 	width: 133
 };
 export const IGNITION_OFFSET_MS: number = 175;
-export const PHYSICS_DEBUG: boolean = true;
+export const PHYSICS_DEBUG: boolean = false;
 export const PHYSICS_DEBUG_RES: number = 500;
 export const STAND_HEIGHT_METERS = 1.5;
 export const FLASK_BASELINE_TEMPERATURE = 20;
