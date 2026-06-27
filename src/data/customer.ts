@@ -6,5 +6,6 @@ export const CUSTOMER_ID_TO_NAME = {
 	JOANY: "Joany",
 	OLE_MARTINSSON: "Big Old Ronnie",
 	WHICKY_VEQUILIA: "Whicky Vequlia",
-	TIM_TOM: "Tim Tom"
+	TIM_TOM: "Tim Tom",
+	JON_JODUN: "???"
 } satisfies Record<CustomerId, String>;
